@@ -6,6 +6,11 @@
 { imports =
     [ ./hardware-configuration.nix ];
 
+  nixpkgs.config.allowUnfreePredicate = pkg: 
+    builtins.elem (lib.getName pkg) [
+      "google-chrome"
+    ];
+
   # boot
   boot.loader.systemd-boot.enable = true; 
   boot.loader.efi.canTouchEfiVariables = true;
@@ -19,14 +24,21 @@
   # time zone. 
   time.timeZone = "America/Denver";
 
+  # wayland config
+  environment.sessionVariables = {
+     XDG_CURRENT_DESKTOP = "sway";
+     XDG_SESSION_DESKTOP = "sway";
+     XDG_SESSION_TYPE = "wayland";
+  };
 
-  # Select internationalisation properties. i18n.defaultLocale = "en_US.UTF-8"; console = {
-  #   font = "Lat2-Terminus16"; keyMap = "us"; useXkbConfig = true; # use xkb.options in tty.
-  # };
+  xdg.portal = {
+    enable = true;
+    wlr.enable = true;
+    config.common.default = "*";
+    extraPortals = [ pkgs.xdg-desktop-portal-wlr ];
+  };
+  services.dbus.enable = true;
 
-  
-
-  # Enable the X11 windowing system. services.xserver.enable = true;
   programs.sway = {
     enable = true;
     wrapperFeatures.gtk = true;
@@ -45,23 +57,16 @@
 
   # sound stuff: use pactl for volume control
   hardware.pulseaudio.enable=true;
-  services.pipewire.enable=false;
   security.rtkit.enable = true;
-  # services.pipewire = {
-  #   enable = true;
-  #   pulse.enable = true;
-  #   alsa.enable = true;
-  #   alsa.support32Bit = true;
-  # };
-  
 
-  # Configure keymap in X11 services.xserver.xkb.layout = "us"; services.xserver.xkb.options = "eurosign:e,caps:escape";
-
-  # Enable CUPS to print documents. services.printing.enable = true;
-
-  # Enable sound. hardware.pulseaudio.enable = true; OR services.pipewire = {
-  #   enable = true; pulse.enable = true;
-  # };
+  # note: pipewire needs to exist for the xdg portal
+  # ... even though we dont use it for audio
+  services.pipewire = {
+    enable = true;
+    jack.enable = false;
+    pulse.enable = false;
+    alsa.enable = false;
+  };
 
   # Enable touchpad support (enabled default in most desktopManager). 
   services.libinput.enable = true;
@@ -85,6 +90,7 @@
     wget
     git
     firefox
+    google-chrome
 
     pavucontrol pamixer
     psmisc # killall
