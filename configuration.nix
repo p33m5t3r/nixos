@@ -95,6 +95,7 @@
     pavucontrol pamixer
     psmisc # killall
     htop
+    neofetch
   ];
 
   # Some programs need SUID wrappers, can be configured further or are started in user sessions. programs.mtr.enable = true; programs.gnupg.agent = {
