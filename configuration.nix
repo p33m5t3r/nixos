@@ -6,6 +6,7 @@
 { imports = [ 
     ./hardware-configuration.nix 
     ./modules/neovim
+    ./modules/python
   ];
 
   # anger stallman
