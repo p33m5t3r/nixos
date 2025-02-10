@@ -3,8 +3,10 @@
 
 { config, lib, pkgs, ... }:
 
-{ imports =
-    [ ./hardware-configuration.nix ];
+{ imports = [ 
+    ./hardware-configuration.nix 
+    ./modules/neovim
+  ];
 
   # anger stallman
   nixpkgs.config.allowUnfreePredicate = pkg: 
@@ -18,7 +20,7 @@
     firefox google-chrome
 
     # cli utils
-    git wget psmisc htop ranger neovim
+    git wget psmisc htop ranger
 
     # sound
     pavucontrol pamixer
@@ -47,6 +49,16 @@
 
   # time zone. 
   time.timeZone = "America/Denver";
+
+  # fonts
+  fonts.packages = with pkgs; [
+    (nerdfonts.override { fonts = [ 
+      "FiraCode"
+      "ProggyClean"
+      "BigBlueTerminal"
+      ]; 
+    })
+  ];
 
   # wayland config
   environment.sessionVariables = {
@@ -94,9 +106,6 @@
 
   programs.bash = {
     completion.enable = true;
-    shellAliases = {
-     vim = "nvim";
-    };
     promptInit = ''
     	PS1='\[\033[35m\]\w\[\033[0m\] λ '
     '';
