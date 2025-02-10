@@ -6,10 +6,34 @@
 { imports =
     [ ./hardware-configuration.nix ];
 
+  # anger stallman
   nixpkgs.config.allowUnfreePredicate = pkg: 
     builtins.elem (lib.getName pkg) [
       "google-chrome"
     ];
+
+  # user packages
+  environment.systemPackages = with pkgs; [
+    # graphical programs
+    firefox google-chrome
+
+    # cli utils
+    git wget psmisc htop ranger neovim
+
+    # sound
+    pavucontrol pamixer
+
+    # vanity
+    neofetch pipes cmatrix
+
+    # claude pwa
+    (makeDesktopItem {
+      name = "claude";
+      exec = "google-chrome-stable --app=https://claude.ai";
+      desktopName = "claude";
+      categories = [ "Network" ];
+    })
+  ];
 
   # boot
   boot.loader.systemd-boot.enable = true; 
@@ -68,47 +92,30 @@
     alsa.enable = false;
   };
 
+  programs.bash = {
+    completion.enable = true;
+    shellAliases = {
+     vim = "nvim";
+    };
+    promptInit = ''
+    	PS1='\[\033[35m\]\w\[\033[0m\] λ '
+    '';
+  };
+
   # Enable touchpad support (enabled default in most desktopManager). 
   services.libinput.enable = true;
+  services.openssh.enable = true;
 
-  # Define a user account. Don't forget to set a password with ‘passwd’. users.users.alice = {
-  #   isNormalUser = true; extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user. packages = with pkgs; [
-  #     tree ];
-  # };
   users.users.anon = {
     isNormalUser = true;
     extraGroups  = ["wheel" "networkmanager" "audio"];
     initialPassword = "anon";
   };
 
-  # List packages installed in system profile. To search, run: $ nix search wget environment.systemPackages = with pkgs; [
-  #   vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default. wget
-  # ];
-  environment.systemPackages = with pkgs; [
-    neovim
-    vim
-    wget
-    git
-    firefox
-    google-chrome
-
-    pavucontrol pamixer
-    psmisc # killall
-    htop
-    neofetch
-  ];
-
-  # Some programs need SUID wrappers, can be configured further or are started in user sessions. programs.mtr.enable = true; programs.gnupg.agent = {
-  #   enable = true; enableSSHSupport = true;
-  # };
-
-  # List services that you want to enable:
-
-  # Enable the OpenSSH daemon. 
-  services.openssh.enable = true;
-
-  # Open ports in the firewall. networking.firewall.allowedTCPPorts = [ ... ]; networking.firewall.allowedUDPPorts = [ ... ]; Or disable the firewall 
-  # altogether. networking.firewall.enable = false;
+  # set a timeout for re-entering sudo pwd
+  security.sudo.extraConfig = ''
+    Defaults timestamp_timeout=120
+  '';
 
   # NO TOUCH!
   system.copySystemConfiguration = true;
