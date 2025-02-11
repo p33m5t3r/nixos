@@ -18,10 +18,9 @@
   };
 
   environment.systemPackages = with pkgs; [
-    cudaPackages.cuda_nvcc
-    cudaPackages.cuda_cudart
-    cudatoolkit
-    stdenv.cc.cc.lib  # for libstdc++
+    # cudaPackages.cuda_nvcc
+    # cudaPackages.cuda_cudart
+    # cudatoolkit
     # config.boot.kernelPackages.nvidia_x11.bin
     config.boot.kernelPackages.nvidiaPackages.production.bin
   ];
@@ -29,10 +28,10 @@
   boot.blacklistedKernelModules = [ "nouveau" ];
   boot.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
 
-  environment.variables = {
-    LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
-      "${pkgs.stdenv.cc.cc.lib}/lib"
-      "${pkgs.cudaPackages.cudatoolkit}/lib"
-    ];
-  };
+  # environment.variables = {
+  #   LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
+  #     "${pkgs.stdenv.cc.cc.lib}/lib"
+  #     "${pkgs.cudaPackages.cudatoolkit}/lib"
+  #   ];
+  # };
 }
