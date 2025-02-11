@@ -2,6 +2,10 @@
 exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
 exec systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
 
+# for nvda gpu
+output * adaptive_sync on
+output * render_bit_depth 10
+
 # monitors
 output HDMI-A-2 mode 2560x1440@59.95Hz
 output eDP-1 position 0,0
