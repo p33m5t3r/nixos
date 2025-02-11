@@ -7,13 +7,11 @@
     ./hardware-configuration.nix 
     ./modules/neovim
     ./modules/python
+    ./modules/nvda
   ];
 
   # anger stallman
-  nixpkgs.config.allowUnfreePredicate = pkg: 
-    builtins.elem (lib.getName pkg) [
-      "google-chrome"
-    ];
+  nixpkgs.config.allowUnfree = true;
 
   # user packages
   environment.systemPackages = with pkgs; [
@@ -21,7 +19,7 @@
     firefox google-chrome
 
     # cli utils
-    git wget psmisc htop ranger
+    git wget psmisc htop ranger pciutils lshw
 
     # sound
     pavucontrol pamixer
