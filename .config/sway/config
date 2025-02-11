@@ -1,0 +1,173 @@
+
+exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
+exec systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+
+# monitors
+output HDMI-A-2 mode 2560x1440@59.95Hz
+output eDP-1 position 0,0
+output HDMI-A-2 position 1920,0
+
+# Default config for sway with custom keybindings
+# Based on the default config
+
+# Mod1 = Alt; Mod4 = Logo
+set $mod Mod4
+
+# vim binds
+set $left h
+set $down j
+set $up k
+set $right l
+
+# terminal
+set $term kitty
+
+# app launcher
+set $menu wofi -s ~/.config/wofi/styles.css --show drun
+
+# Default wallpaper
+# output * bg @datadir@/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
+
+# audio controls via pulseaudio
+bindsym XF86AudioRaiseVolume exec pactl set-sink-volume @DEFAULT_SINK@ +5%
+bindsym XF86AudioLowerVolume exec pactl set-sink-volume @DEFAULT_SINK@ -5%
+bindsym XF86AudioMute exec pactl set-sink-mute @DEFAULT_SINK@ toggle
+
+# scroll like a normal person
+input * {
+  natural_scroll enabled
+}
+
+# Start a terminal
+bindsym $mod+Return exec $term
+bindsym $mod+Shift+q kill
+bindsym $mod+space exec $menu
+
+# Drag floating windows by holding down $mod and left mouse button.
+floating_modifier $mod normal
+
+# Reload the configuration file
+bindsym $mod+Shift+r reload
+
+# Exit sway (logs you out of your Wayland session)
+bindsym $mod+Shift+e exec swaynag -t warning -m 'do u rly wna kill wayland?' -B 'yes, exit sway' 'swaymsg exit'
+
+#
+# Moving around:
+#
+    # Move your focus around (vim keys)
+    bindsym $mod+$left focus left
+    bindsym $mod+$down focus down
+    bindsym $mod+$up focus up
+    bindsym $mod+$right focus right
+
+    # Move the focused window
+    bindsym $mod+Shift+$left move left
+    bindsym $mod+Shift+$down move down
+    bindsym $mod+Shift+$up move up
+    bindsym $mod+Shift+$right move right
+
+#
+# Workspaces:
+#
+    # Switch to workspace
+    bindsym $mod+1 workspace number 1
+    bindsym $mod+2 workspace number 2
+    bindsym $mod+3 workspace number 3
+    bindsym $mod+4 workspace number 4
+    bindsym $mod+5 workspace number 5
+    bindsym $mod+6 workspace number 6
+    bindsym $mod+7 workspace number 7
+    bindsym $mod+8 workspace number 8
+    bindsym $mod+9 workspace number 9
+    bindsym $mod+0 workspace number 10
+
+    # Move focused container to workspace
+    bindsym $mod+Shift+1 move container to workspace number 1
+    bindsym $mod+Shift+2 move container to workspace number 2
+    bindsym $mod+Shift+3 move container to workspace number 3
+    bindsym $mod+Shift+4 move container to workspace number 4
+    bindsym $mod+Shift+5 move container to workspace number 5
+    bindsym $mod+Shift+6 move container to workspace number 6
+    bindsym $mod+Shift+7 move container to workspace number 7
+    bindsym $mod+Shift+8 move container to workspace number 8
+    bindsym $mod+Shift+9 move container to workspace number 9
+    bindsym $mod+Shift+0 move container to workspace number 10
+
+#
+# Layout stuff:
+#
+    # Split bindings (your custom semicolon bindings)
+    bindsym $mod+semicolon splith
+    bindsym $mod+Shift+semicolon splitv
+
+    # Switch the current container between different layout styles
+    bindsym $mod+s layout stacking
+    bindsym $mod+w layout tabbed
+    bindsym $mod+e layout toggle split
+
+    # Make the current focus fullscreen
+    bindsym $mod+f fullscreen
+
+    # Toggle floating
+    bindsym $mod+Shift+space floating toggle
+    bindsym $mod+t focus mode_toggle
+
+    # Move focus to the parent container
+    bindsym $mod+a focus parent
+
+#
+# Resizing containers:
+#
+mode "resize" {
+    bindsym $left resize shrink width 10px
+    bindsym $down resize grow height 10px
+    bindsym $up resize shrink height 10px
+    bindsym $right resize grow width 10px
+
+    # Return to default mode
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+    bindsym $mod+r mode "default"
+}
+bindsym $mod+r mode "resize"
+
+#
+# Status Bar:
+#
+bar {
+  swaybar_command waybar
+}
+
+# Colors - adjust these hex values to change theme
+set $bg-lite #1d2021
+set $bg-dark #161819
+set $fg-lite #FFB6C1
+set $fg-dark #d4be98
+set $ac-lite #FFB6C1
+set $ac-dark #7c6f64
+
+# Window colors -       <border> <background> <text> <indicator> <child_border>
+client.focused          $ac-lite $bg-lite $fg-lite $ac-lite $ac-lite
+client.focused_inactive $ac-dark $bg-dark $fg-dark $ac-dark $ac-dark
+client.unfocused        $ac-dark $bg-dark $fg-dark $ac-dark $ac-dark
+client.urgent           #e78a4e #e78a4e #000000 #e78a4e #e78a4e
+
+# Border and gap styling
+# Width of window borders (can use decimals)
+default_border pixel 1
+
+# Width of floating window borders
+default_floating_border pixel 1
+
+# Space between windows
+gaps inner 4
+gaps outer 4
+
+# Disable gaps when only one window
+# smart_gaps on
+
+# Hide borders when only one window
+# smart_borders on
+
+include @sysconfdir@/sway/config.d/*

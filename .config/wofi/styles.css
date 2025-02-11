@@ -1,0 +1,60 @@
+/* === Window Styling === */
+window {
+    background-color: #101010; /* Deep blackish-gray */
+    border: 4px double #FFB6C1; /* Softer pastel pink */
+    padding: 10px;
+}
+
+/* === Outer Box === */
+#outer-box {
+    background-color: #101010; /* Same as window */
+    border: none;
+}
+
+/* === Input Box === */
+#input {
+    background-color: #000000; /* True black */
+    color: #FFB6C1; /* Light pastel pink text */
+    border: 3px double #FFB6C1; /* Softer pink double outline */
+    padding: 5px;
+    font-family: "Fixedsys", monospace;
+    font-size: 16px;
+    text-transform: uppercase;
+}
+
+/* === Scroll Box === */
+#scroll {
+    background-color: #101010; /* Dark gray */
+    border: none;
+}
+
+/* === Entry Styling (Unselected) === */
+#entry {
+    background-color: #000000; /* Black */
+    color: #FFB6C1; /* Soft pastel pink text */
+    border: 3px double #FFB6C1; /* Double-outline borders */
+    margin: 4px 0;
+    padding: 5px;
+    font-family: "Fixedsys", monospace;
+    font-size: 16px;
+    text-transform: uppercase;
+}
+
+/* === Entry Styling (Selected) === */
+#entry:selected {
+    background-color: #FFB6C1; /* Light pastel pink */
+    color: #000000; /* Black text */
+    border: 3px double #FFFFFF; /* White double border for contrast */
+}
+
+/* === Entry Text === */
+#text {
+    font-family: "Fixedsys", monospace;
+    font-size: 16px;
+}
+
+/* === Selected Text === */
+#text:selected {
+    color: #000000; /* Black text when selected */
+}
+
