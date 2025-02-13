@@ -6,7 +6,7 @@
 { imports = [ 
     ./hardware-configuration.nix 
     ./modules/neovim
-    ./modules/python
+    # ./modules/python
     ./modules/nvda
   ];
 
@@ -38,11 +38,14 @@
 
   # boot
   boot.loader.systemd-boot.enable = true; 
-  boot.loader.efi.canTouchEfiVariables = true;
+  boot.loader.efi = {
+    canTouchEfiVariables = true;
+    efiSysMountPoint = "/boot/efi";
+  };
 
   # networking
   networking = {
-    hostName = "nixos";
+    hostName = "nixosbox";
     networkmanager.enable = true;
   };
 
