@@ -5,19 +5,14 @@
   networking.hostName = "desktop";
   
   imports = [ 
-    ./modules/nvda
+    ./modules/nvda/desktop.nix
   ];
 
-  # home-manager = {
-  #   useGlobalPkgs = true;
-  #   users.anon = {
-  #     wayland.windowManager.sway = {
-  #       enable = true;
-  #       config = {
-  #         # Your desktop-specific Sway config here
-  #         # e.g., different monitor setup
-  #       };
-  #     };
-  #   };
-  # };
+  home-manager = {
+    useGlobalPkgs = true;
+    users.anon = {
+      imports = [ ./home/sway/desktop.nix ];
+      home.stateVersion = "24.11";
+    };
+  };
 }

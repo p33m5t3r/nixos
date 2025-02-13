@@ -4,32 +4,31 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
-    # home-manager = {
-    #   url = "github:nix-community/home-manager";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  # outputs = { self, nixpkgs, home-manager }: {
-  outputs = { self, nixpkgs }: {
+  outputs = { self, nixpkgs, home-manager }: {
     nixosConfigurations = {
       laptop = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
-          ./hardware-configuration.nix
+          ./hardware/hardware-configuration-laptop.nix
           ./shared.nix
-          # ./laptop.nix TODO
-          # home-manager.nixosModules.home-manager
+          ./laptop.nix
+          home-manager.nixosModules.home-manager
         ];
       };
 
       desktop = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
-          ./hardware-configuration.nix
+          ./hardware/hardware-configuration-desktop.nix
           ./shared.nix
           ./desktop.nix
-          # home-manager.nixosModules.home-manager
+          home-manager.nixosModules.home-manager
         ];
       };
     };
