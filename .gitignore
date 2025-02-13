@@ -1,5 +1,5 @@
 # dont include base hardware-configuration
-hardware-configuration.nix
+# hardware-configuration.nix
 
 # ignore auto-gen'd dotfiles
 dconf/

@@ -1,27 +1,20 @@
-# Edit this configuration file to define what should be installed on your system. Help is available in the configuration.nix(5) man page, on 
-# https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
-
-{ config, lib, pkgs, ... }:
-
-{ imports = [ 
-    ./hardware-configuration.nix 
+{ config, lib, pkgs, ... }: {
+  imports = [ 
     ./modules/neovim
     # ./modules/python
-    ./modules/nvda
   ];
 
-  # anger stallman
   nixpkgs.config.allowUnfree = true;
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  # user packages
   environment.systemPackages = with pkgs; [
-    # graphical programs
+    # graphical user programs
     firefox google-chrome
 
     # cli utils
     git wget psmisc htop ranger pciutils lshw
 
-    # sound
+    # audio
     pavucontrol pamixer
 
     # vanity
@@ -36,37 +29,27 @@
     })
   ];
 
-  # boot
-  boot.loader.systemd-boot.enable = true; 
-  boot.loader.efi = {
-    canTouchEfiVariables = true;
-    efiSysMountPoint = "/boot/efi";
+  boot.loader = {
+    systemd-boot.enable = true;
+    efi.canTouchEfiVariables = true;
   };
 
-  # networking
-  networking = {
-    hostName = "nixosbox";
-    networkmanager.enable = true;
-  };
-
-  # time zone. 
+  networking.networkmanager.enable = true;
   time.timeZone = "America/Denver";
 
-  # fonts
   fonts.packages = with pkgs; [
     (nerdfonts.override { fonts = [ 
-      "FiraCode"
+      "FiraCode" 
       "ProggyClean"
-      "BigBlueTerminal"
+      "BigBlueTerminal" 
       ]; 
     })
   ];
 
-  # wayland config
   environment.sessionVariables = {
-     XDG_CURRENT_DESKTOP = "sway";
-     XDG_SESSION_DESKTOP = "sway";
-     XDG_SESSION_TYPE = "wayland";
+    XDG_CURRENT_DESKTOP = "sway";
+    XDG_SESSION_DESKTOP = "sway";
+    XDG_SESSION_TYPE = "wayland";
   };
 
   xdg.portal = {
@@ -75,8 +58,8 @@
     config.common.default = "*";
     extraPortals = [ pkgs.xdg-desktop-portal-wlr ];
   };
-  services.dbus.enable = true;
 
+  services.dbus.enable = true;
   programs.sway = {
     enable = true;
     wrapperFeatures.gtk = true;
@@ -93,12 +76,8 @@
     ];
   };
 
-  # sound stuff: use pactl for volume control
-  hardware.pulseaudio.enable=true;
+  hardware.pulseaudio.enable = true;
   security.rtkit.enable = true;
-
-  # note: pipewire needs to exist for the xdg portal
-  # ... even though we dont use it for audio
   services.pipewire = {
     enable = true;
     jack.enable = false;
@@ -109,27 +88,23 @@
   programs.bash = {
     completion.enable = true;
     promptInit = ''
-    	PS1='\[\033[35m\]\w\[\033[0m\] λ '
+      PS1='\[\033[35m\]\w\[\033[0m\] λ '
     '';
   };
 
-  # Enable touchpad support (enabled default in most desktopManager). 
   services.libinput.enable = true;
   services.openssh.enable = true;
 
   users.users.anon = {
     isNormalUser = true;
-    extraGroups  = ["wheel" "networkmanager" "audio"];
+    extraGroups = ["wheel" "networkmanager" "audio"];
     initialPassword = "anon";
   };
 
-  # set a timeout for re-entering sudo pwd
   security.sudo.extraConfig = ''
     Defaults timestamp_timeout=120
   '';
 
   # NO TOUCH!
-  system.copySystemConfiguration = true;
   system.stateVersion = "24.11";
 }
-
