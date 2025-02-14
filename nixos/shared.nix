@@ -20,8 +20,8 @@ in {
     useGlobalPkgs = true;
     users.anon = {
       home.stateVersion = "24.11";
-      home.file.".config/nvim/init.lua".source =
-        mkOutOfStoreSymlink ../.config/nvim/init.lua;
+      # home.file.".config/nvim/init.lua".source =
+      #  mkOutOfStoreSymlink ../.config/nvim/init.lua;
       home.file.".config/swaylock".source = ../.config/swaylock;
       home.file.".config/kitty".source = ../.config/kitty;
       home.file.".config/waybar".source = ../.config/waybar;

@@ -33,7 +33,7 @@ vim.keymap.set("n", "n", "nzzzv")
 vim.keymap.set("n", "N", "Nzzzv")
 vim.keymap.set("n", "<leader>gs", vim.cmd.Git)
 vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle)
-vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
+vim.keymap.set("n", "<leader>fb", vim.cmd.Ex)
 vim.keymap.set("n", "<leader>cc", function () 
     local current_cc = vim.wo.colorcolumn
     if current_cc == "" then
