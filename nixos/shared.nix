@@ -1,4 +1,13 @@
-{ config, lib, pkgs, ... }: {
+{ config, lib, pkgs, ... }:
+with lib;
+let
+  mkOutOfStoreSymlink = path:
+    let
+      pathStr = toString path;
+      name = baseNameOf pathStr;
+    in
+      pkgs.runCommandLocal name {} ''ln -s ${escapeShellArg pathStr} $out'';
+in {
   imports = [ 
     ./modules/neovim
     # ./modules/python
@@ -11,7 +20,8 @@
     useGlobalPkgs = true;
     users.anon = {
       home.stateVersion = "24.11";
-      home.file.".config/nvim/init.lua".source = ../.config/nvim/init.lua;
+      home.file.".config/nvim/init.lua".source =
+        mkOutOfStoreSymlink ../.config/nvim/init.lua;
       home.file.".config/swaylock".source = ../.config/swaylock;
       home.file.".config/kitty".source = ../.config/kitty;
       home.file.".config/waybar".source = ../.config/waybar;
