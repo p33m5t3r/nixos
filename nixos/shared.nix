@@ -7,6 +7,18 @@
   nixpkgs.config.allowUnfree = true;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
+  home-manager = {
+    useGlobalPkgs = true;
+    users.anon = {
+      home.stateVersion = "24.11";
+      home.file.".config/nvim/init.lua".source = ../.config/nvim/init.lua;
+      home.file.".config/swaylock".source = ../.config/swaylock;
+      home.file.".config/kitty".source = ../.config/kitty;
+      home.file.".config/waybar".source = ../.config/waybar;
+      home.file.".config/wofi".source = ../.config/wofi;
+    };
+  };
+
   environment.systemPackages = with pkgs; [
     # graphical user programs
     firefox google-chrome
