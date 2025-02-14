@@ -14,14 +14,36 @@ vim.opt.backspace = {'indent', 'eol', 'start'}
 vim.opt.clipboard = 'unnamedplus'
 vim.opt.completeopt = "menuone,noinsert,noselect"
 vim.opt.shortmess = vim.opt.shortmess + "c"
-vim.opt.expandtab = true
+vim.opt.termguicolors = true
+vim.opt.scrolloff = 8
+vim.opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
+vim.opt.undofile = true
 vim.cmd([[
   autocmd FileType lua setlocal shiftwidth=2 softtabstop=2
   autocmd FileType nix setlocal shiftwidth=2 softtabstop=2
   autocmd FileType python setlocal shiftwidth=4 softtabstop=4
 ]])
 
----------------------- use packer for non-nixos --------------
+
+---------------------- keybinds -------------------------
+vim.g.mapleader = " "
+vim.keymap.set("n", "<C-d>", "<C-d>zz")
+vim.keymap.set("n", "<C-u>", "<C-u>zz")
+vim.keymap.set("n", "n", "nzzzv")
+vim.keymap.set("n", "N", "Nzzzv")
+vim.keymap.set("n", "<leader>gs", vim.cmd.Git)
+vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle)
+vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
+vim.keymap.set("n", "<leader>cc", function () 
+    local current_cc = vim.wo.colorcolumn
+    if current_cc == "" then
+        vim.wo.colorcolumn = "80"
+    else
+        vim.wo.colorcolumn = ""
+    end
+end)
+
+---------------------- packer ---------------------------
 local ensure_packer = function()
   local fn = vim.fn
   local install_path = fn.stdpath("data") .. "/site/pack/packer/start/packer.nvim"
@@ -43,9 +65,8 @@ if not status_ok then
   return
 end
 
--- packages unavail
 require("packer").startup(function(use)
-  use("wbthomason/packer.nvim")     -- packer
+  use("wbthomason/packer.nvim")
 
   -- colorschemes
   use("EdenEast/nightfox.nvim")
@@ -57,7 +78,6 @@ require("packer").startup(function(use)
   use("neovim/nvim-lspconfig")              
     use{  -- lsp progress bar
       "j-hui/fidget.nvim",
-      tag='legacy',
       config = function()
         require("fidget").setup()
       end
@@ -76,8 +96,28 @@ require("packer").startup(function(use)
 
   use("simrat39/rust-tools.nvim")           -- ?
   use("nvim-lua/popup.nvim")                -- ?
-  use("nvim-lua/plenary.nvim")              -- ?
-  use("nvim-telescope/telescope.nvim")      -- ?
+  -- file nav
+  use("nvim-lua/plenary.nvim")
+  use("nvim-telescope/telescope.nvim")
+  use("theprimeagen/harpoon")
+
+  -- git
+  use("tpope/vim-fugitive")
+  use {'lewis6991/gitsigns.nvim',
+    config = function()
+        require('gitsigns').setup({
+            signs = {
+                add = { text = '+' },
+                change = { text = '~' },
+                delete = { text = '-' },
+            }
+        })
+    end
+  }
+
+  -- undo tree
+  use('mbbill/undotree')
+
   use("onsails/lspkind.nvim")               -- lsp completion icons
   use("preservim/nerdtree")                 -- file explorer
   use("lervag/vimtex")                      -- TeX compilation
@@ -132,6 +172,31 @@ if packer_bootstrap then
   require("packer").sync()
 end
 
+
+------------------------ file jumping ----------------------------
+--- <C-v>	Go to file selection as a vsplit
+--- <C-t>	Go to a file in a new tab
+local builtin = require('telescope.builtin')
+vim.keymap.set('n', '<C-p>', builtin.git_files, {})
+vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
+vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
+
+local mark = require("harpoon.mark")
+local ui = require("harpoon.ui")
+vim.keymap.set('n', '<leader>a', mark.add_file)
+vim.keymap.set('n', '<leader>h', ui.toggle_quick_menu)
+vim.keymap.set('n', '<leader>g1', function () ui.nav_file(1) end)
+vim.keymap.set('n', '<leader>g2', function () ui.nav_file(2) end)
+vim.keymap.set('n', '<leader>g3', function () ui.nav_file(3) end)
+vim.keymap.set('n', '<leader>g4', function () ui.nav_file(4) end)
+
+vim.keymap.set("n", "<leader>gt", function()
+    require('gitsigns').toggle_signs()
+end)
+
+vim.keymap.set("n", "<leader>gh", function()
+    require('gitsigns').preview_hunk()
+end)
 
 ------------------------ LSP config ----------------------------
 local lspconfig = require('lspconfig')
@@ -295,38 +360,6 @@ cmp.setup({
     { name = "buffer" },
   },
 })
-
-
----------------------- live reload buffer ----------------------
-local function reload_current_buffer()
-  local current_file = vim.fn.expand('%:p')
-  if vim.fn.fnamemodify(current_file, ':e') == 'lua' then
-    vim.cmd('luafile ' .. current_file)
-    print('Reloaded Lua file: ' .. current_file)
-  else
-    vim.cmd('source ' .. current_file)
-    print('Reloaded file: ' .. current_file)
-  end
-end
-
--- Create a Neovim command to reload the current buffer
-vim.api.nvim_create_user_command("Reload", reload_current_buffer, {})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
