@@ -135,6 +135,9 @@ in {
       py-dev = ''
         nix develop ~/nixos/flakes/py
       '';
+      rust-dev = ''
+        nix develop ~/nixos/flakes/rust
+      '';
     };
     completion.enable = true;
     promptInit = ''

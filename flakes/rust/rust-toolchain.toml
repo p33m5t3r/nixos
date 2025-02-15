@@ -1,0 +1,10 @@
+[toolchain]
+channel = "stable"
+components = [
+    "rustc",
+    "rust-std",
+    "cargo",
+    "rust-analyzer",
+    "rust-src"
+]
+profile = "default"
