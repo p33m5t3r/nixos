@@ -283,6 +283,9 @@ lspconfig.clangd.setup{
 -- haskell
 lspconfig.hls.setup{}
 
+-- typescript
+lspconfig.ts_ls.setup{}
+
 
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('UserLspConfig', {}),
@@ -360,6 +363,41 @@ cmp.setup({
     { name = "buffer" },
   },
 })
+
+
+-- hs stuff
+function OpenGhci()
+  -- Get the full path of the current file
+  local filename = vim.fn.expand('%:p')
+
+  -- Open a new split
+  vim.cmd('split')
+
+  -- Open terminal in insert mode
+  vim.cmd('terminal')
+  vim.cmd('startinsert')
+
+  -- Resize the split
+  vim.cmd('resize 15')
+
+  -- Function to send command to terminal
+  local function send_to_terminal(command)
+    vim.api.nvim_input(command)
+  end
+
+  -- Use vim.schedule to ensure the terminal is ready
+  vim.schedule(function()
+    -- Clear the terminal (optional)
+    send_to_terminal('clear<CR>')
+
+    -- Start GHCi and load the current file
+    send_to_terminal('ghci ' .. vim.fn.shellescape(filename) .. '<CR>')
+  end)
+end
+
+-- Map this function to a key, e.g., <Leader>g
+vim.api.nvim_set_keymap('n', '<Leader>gg', ':lua OpenGhci()<CR>', {noremap = true, silent = true})
+
 
 
 

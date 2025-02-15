@@ -110,7 +110,12 @@ in {
   programs.bash = {
     completion.enable = true;
     promptInit = ''
-      PS1='\[\033[35m\]\w\[\033[0m\] λ '
+      __prompt_nix_shell() {
+        if [ -n "$IN_NIX_SHELL" ]; then
+          echo "❄️ "  # Snowflake for Nix
+        fi
+      }
+      PS1='\[\033[36m\]$(__prompt_nix_shell)\[\033[35m\]\w\[\033[0m\] λ '
     '';
   };
 
