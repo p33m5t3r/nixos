@@ -29,9 +29,16 @@ in {
     };
   };
 
+  # programs.steam = {
+  #   enable = true;
+  #   remotePlay.openFirewall = true;
+  #   dedicatedServer.openFirewall = true;
+  #   localNetworkGameTransfers.openFirewall = true;
+  # };
+
   environment.systemPackages = with pkgs; [
     # graphical user programs
-    firefox google-chrome
+    firefox google-chrome telegram-desktop
 
     # cli utils
     git wget psmisc htop ranger pciutils lshw
@@ -40,7 +47,7 @@ in {
     pavucontrol pamixer
 
     # vanity
-    neofetch pipes cmatrix
+    neofetch pipes cmatrix cowsay
 
     # claude pwa
     (makeDesktopItem {
@@ -108,6 +115,27 @@ in {
   };
 
   programs.bash = {
+    shellAliases = {
+      lah = "ls -lah";
+      generations-list = ''
+        sudo nix-env -p /nix/var/nix/profiles/system --list-generations
+      '';
+      generations-delete = ''
+        sudo nix-env --delete-generations +3
+      '';
+      generations-gc = ''
+        sudo nix store gc
+      '';
+      hs-dev = ''
+        nix develop ~/nixos/flakes/hs
+      '';
+      ts-dev = ''
+        nix develop ~/nixos/flakes/ts
+      '';
+      py-dev = ''
+        nix develop ~/nixos/flakes/py
+      '';
+    };
     completion.enable = true;
     promptInit = ''
       __prompt_nix_shell() {
