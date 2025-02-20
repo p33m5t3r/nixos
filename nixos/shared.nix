@@ -152,6 +152,7 @@ in {
 
   services.libinput.enable = true;
   services.openssh.enable = true;
+  programs.ssh.startAgent = true;
 
   users.users.anon = {
     isNormalUser = true;

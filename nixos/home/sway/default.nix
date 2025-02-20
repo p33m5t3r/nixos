@@ -16,6 +16,7 @@
       startup = [
         { command = "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway"; }
         { command = "systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"; }
+        { command = "eval $(ssh-agent -s)"; }
       ];
 
       # Global output configuration
