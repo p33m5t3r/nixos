@@ -39,6 +39,7 @@ in {
   environment.systemPackages = with pkgs; [
     # graphical user programs
     firefox google-chrome telegram-desktop
+    code-cursor spotify
 
     # cli utils
     git wget psmisc htop ranger pciutils lshw
