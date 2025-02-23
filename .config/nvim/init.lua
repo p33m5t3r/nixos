@@ -25,25 +25,39 @@ vim.cmd([[
 ]])
 
 
+---------------------- colorscheme ----------------------
+vim.cmd("colorscheme peachpuff")
+-- vim.cmd("colorscheme jellybeans")
+
 ---------------------- keybinds -------------------------
 vim.g.mapleader = " "
-vim.keymap.set("n", "<C-d>", "<C-d>zz")
-vim.keymap.set("n", "<C-u>", "<C-u>zz")
-vim.keymap.set("n", "n", "nzzzv")
-vim.keymap.set("n", "N", "Nzzzv")
-vim.keymap.set('n', '<leader>nt', ':tabnew<CR>', { silent = true })
-vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float)
-vim.keymap.set("n", "<leader>gs", vim.cmd.Git)
-vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle)
-vim.keymap.set("n", "<leader>fb", vim.cmd.Ex)
-vim.keymap.set("n", "<leader>cc", function () 
+vim.keymap.set("n", "<C-d>", "<C-d>zz", 
+{ desc = "Scroll down keeping cursor centered" })
+vim.keymap.set("n", "<C-u>", "<C-u>zz", 
+{ desc = "Scroll up keeping cursor centered" })
+vim.keymap.set("n", "n", "nzzzv", 
+{ desc = "Next search result centered" })
+vim.keymap.set("n", "N", "Nzzzv", 
+{ desc = "Previous search result centered" })
+vim.keymap.set('n', '<leader>nt', ':tabnew<CR>', 
+{ silent = true, desc = "New tab" })
+vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, 
+{ desc = "Show LSP error" })
+vim.keymap.set("n", "<leader>gs", vim.cmd.Git, 
+{ desc = "Open Git status" })
+vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle, 
+{ desc = "Toggle undotree" })
+vim.keymap.set("n", "<leader>fb", vim.cmd.Ex, 
+{ desc = "Open netrw explorer" })
+vim.keymap.set("n", "<leader>cc", function() 
     local current_cc = vim.wo.colorcolumn
     if current_cc == "" then
         vim.wo.colorcolumn = "80"
     else
         vim.wo.colorcolumn = ""
     end
-end)
+end, { desc = "Toggle 80 char column" })
+
 
 ---------------------- packer ---------------------------
 local ensure_packer = function()
@@ -74,7 +88,6 @@ require("packer").startup(function(use)
   use("EdenEast/nightfox.nvim")
   use("rebelot/kanagawa.nvim")
   use("rafi/awesome-vim-colorschemes")
-  vim.cmd("colorscheme jellybeans")
   
   -- lsp
   use("neovim/nvim-lspconfig")              
@@ -98,11 +111,49 @@ require("packer").startup(function(use)
 
   use("simrat39/rust-tools.nvim")           -- ?
   use("nvim-lua/popup.nvim")                -- ?
-  -- file nav
-  use("nvim-lua/plenary.nvim")
-  use("nvim-telescope/telescope.nvim")
   use("theprimeagen/harpoon")
+  -- file nav
+  -- use("nvim-lua/plenary.nvim")
+  -- use("nvim-telescope/telescope.nvim")
+  use {
+    'nvim-telescope/telescope.nvim',
+    requires = { {'nvim-lua/plenary.nvim'} }
+  }
 
+  require('telescope').setup{
+    pickers = {
+      colorscheme = {
+        enable_preview = true
+      }
+    }
+  }
+
+  -- line indents
+  use("lukas-reineke/indent-blankline.nvim")
+  local highlight = {
+      -- "CursorColumn",
+      "Whitespace",
+      "Function",
+      "Label",
+  }
+  local ibl = require('ibl')
+  ibl.setup {
+      enabled = false,
+      indent = { 
+        highlight = highlight,
+        char = "▏",
+        tab_char = {"a", "b"},
+      },
+      whitespace = {
+        highlight = highlight,
+        remove_blankline_trail = false,
+      },
+      scope = { enabled = false },
+  }
+  vim.keymap.set("n", "<leader>w", vim.cmd.IBLToggle,
+  { desc = "toggle indent guides" })
+
+  
   -- git
   use("tpope/vim-fugitive")
   use {'lewis6991/gitsigns.nvim',
@@ -182,6 +233,7 @@ local builtin = require('telescope.builtin')
 vim.keymap.set('n', '<C-p>', builtin.git_files, {})
 vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
 vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
+-- vim.keymap.set('n', '
 
 local mark = require("harpoon.mark")
 local ui = require("harpoon.ui")
@@ -192,12 +244,21 @@ vim.keymap.set('n', '<leader>g2', function () ui.nav_file(2) end)
 vim.keymap.set('n', '<leader>g3', function () ui.nav_file(3) end)
 vim.keymap.set('n', '<leader>g4', function () ui.nav_file(4) end)
 
+local gitsigns = require('gitsigns')
 vim.keymap.set("n", "<leader>gt", function()
-    require('gitsigns').toggle_signs()
+    gitsigns.toggle_signs()
 end)
 
 vim.keymap.set("n", "<leader>gh", function()
-    require('gitsigns').preview_hunk()
+    gitsigns.preview_hunk_inline()
+end)
+
+vim.keymap.set("n", "<leader>gu", function()
+    gitsigns.reset_hunk()
+end)
+
+vim.keymap.set("n", "<leader>gw", function()
+    gitsigns.toggle_word_diff()
 end)
 
 ------------------------ LSP config ----------------------------
