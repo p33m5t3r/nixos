@@ -26,8 +26,8 @@ vim.cmd([[
 
 
 ---------------------- colorscheme ----------------------
-vim.cmd("colorscheme peachpuff")
--- vim.cmd("colorscheme jellybeans")
+-- vim.cmd("colorscheme peachpuff")
+vim.cmd("colorscheme jellybeans")
 
 ---------------------- keybinds -------------------------
 vim.g.mapleader = " "

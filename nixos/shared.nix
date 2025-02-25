@@ -11,7 +11,12 @@ in {
   imports = [ 
     ./modules/neovim
     # ./modules/python
+    ./modules/scripts
   ];
+  modules.scripts = {
+    enable = true;
+    scriptsPath = "/home/anon/nixos/nixos/modules/scripts";
+  };
 
   nixpkgs.config.allowUnfree = true;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -29,6 +34,14 @@ in {
     };
   };
 
+  # fierce tty setup
+  i18n.defaultLocale = "en_US.UTF-8";
+  console = {
+    font = "ter-u20b";
+    packages = [ pkgs.kbd pkgs.terminus_font ];
+    useXkbConfig = true;
+  };
+
   # programs.steam = {
   #   enable = true;
   #   remotePlay.openFirewall = true;
@@ -42,7 +55,7 @@ in {
     code-cursor spotify
 
     # cli utils
-    git wget psmisc htop ranger pciutils lshw
+    git wget psmisc htop ranger pciutils lshw tmux
 
     # audio
     pavucontrol pamixer

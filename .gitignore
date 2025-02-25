@@ -1,6 +1,10 @@
 # dont include base hardware-configuration
 hardware-configuration.nix
 
+# dont include one-off shell scripts 
+nixos/modules/scripts/*
+!nixos/modules/scripts/default.nix
+
 # ignore auto-gen'd dotfiles
 dconf/
 google-chrome/
