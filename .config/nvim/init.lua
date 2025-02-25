@@ -291,17 +291,28 @@ require("rust-tools").setup({
 })
 
 -- python
-lspconfig.pylsp.setup{
+require("lspconfig").pyright.setup({
   settings = {
-    pylsp = {
-      plugins = {
-        pycodestyle = {
-            enabled = false,
-        }
+    python = {
+      analysis = {
+        autoSearchPaths = true,
+        useLibraryCodeForTypes = true,
+        extraPaths = {},
       }
     }
   }
-}
+})
+-- lspconfig.pylsp.setup{
+--   settings = {
+--     pylsp = {
+--       plugins = {
+--         pycodestyle = {
+--             enabled = false,
+--         }
+--       }
+--     }
+--   }
+-- }
 
 -- terraform
 lspconfig.terraformls.setup{}

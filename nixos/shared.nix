@@ -10,7 +10,7 @@ let
 in {
   imports = [ 
     ./modules/neovim
-    # ./modules/python
+    ./modules/python
     ./modules/scripts
   ];
   modules.scripts = {
@@ -140,17 +140,20 @@ in {
       generations-gc = ''
         sudo nix store gc
       '';
-      hs-dev = ''
+      dev-hs = ''
         nix develop ~/nixos/flakes/hs
       '';
-      ts-dev = ''
+      dev-ts = ''
         nix develop ~/nixos/flakes/ts
       '';
-      py-dev = ''
+      dev-py = ''
         nix develop ~/nixos/flakes/py
       '';
-      rust-dev = ''
+      dev-rust = ''
         nix develop ~/nixos/flakes/rust
+      '';
+      dev-claude = ''
+        nix develop ~/nixos/flakes/claude
       '';
     };
     completion.enable = true;
