@@ -12,6 +12,7 @@ in {
     ./modules/neovim
     ./modules/python
     ./modules/scripts
+    ./modules/docker
   ];
   modules.scripts = {
     enable = true;
