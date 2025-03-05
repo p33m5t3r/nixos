@@ -1,4 +1,4 @@
-
+It seems like you haven't provided a specific selection for to work with. Please highlight the text or code you me to modify, and I'll help you with it
 ---------------------- baseline options ----------------------
 local home = os.getenv("HOME")
 vim.opt.ignorecase = true
@@ -27,29 +27,35 @@ vim.cmd([[
 
 ---------------------- colorscheme ----------------------
 -- vim.cmd("colorscheme peachpuff")
-vim.cmd("colorscheme jellybeans")
+
+local theme = 'nordfox'
+local set_colorscheme = function(mode)
+  if mode == 'light' then theme = 'dayfox' end
+  vim.cmd(string.format("colorscheme %s", theme))
+end
+set_colorscheme(os.getenv('COLORCONFIG'))
 
 ---------------------- keybinds -------------------------
 vim.g.mapleader = " "
-vim.keymap.set("n", "<C-d>", "<C-d>zz", 
+vim.keymap.set("n", "<C-d>", "<C-d>zz",
 { desc = "Scroll down keeping cursor centered" })
-vim.keymap.set("n", "<C-u>", "<C-u>zz", 
+vim.keymap.set("n", "<C-u>", "<C-u>zz",
 { desc = "Scroll up keeping cursor centered" })
-vim.keymap.set("n", "n", "nzzzv", 
+vim.keymap.set("n", "n", "nzzzv",
 { desc = "Next search result centered" })
-vim.keymap.set("n", "N", "Nzzzv", 
+vim.keymap.set("n", "N", "Nzzzv",
 { desc = "Previous search result centered" })
-vim.keymap.set('n', '<leader>nt', ':tabnew<CR>', 
+vim.keymap.set('n', '<leader>nt', ':tabnew<CR>',
 { silent = true, desc = "New tab" })
-vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, 
+vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float,
 { desc = "Show LSP error" })
-vim.keymap.set("n", "<leader>gs", vim.cmd.Git, 
+vim.keymap.set("n", "<leader>gs", vim.cmd.Git,
 { desc = "Open Git status" })
-vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle, 
+vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle,
 { desc = "Toggle undotree" })
-vim.keymap.set("n", "<leader>fb", vim.cmd.Ex, 
+vim.keymap.set("n", "<leader>fb", vim.cmd.Ex,
 { desc = "Open netrw explorer" })
-vim.keymap.set("n", "<leader>cc", function() 
+vim.keymap.set("n", "<leader>cc", function()
     local current_cc = vim.wo.colorcolumn
     if current_cc == "" then
         vim.wo.colorcolumn = "80"
@@ -57,14 +63,36 @@ vim.keymap.set("n", "<leader>cc", function()
         vim.wo.colorcolumn = ""
     end
 end, { desc = "Toggle 80 char column" })
+vim.keymap.set('v', '<leader>x', "y<cmd>lua load(vim.fn.getreg('\"'))()<CR>",
+{ noremap = true, silent = true, desc = "Execute selected Lua code" })
+vim.keymap.set('n', '<leader>x', 'V"zy<cmd>lua load(vim.fn.getreg("z"))()<CR>',
+{ noremap = true, silent = true, desc = "Execute current line as Lua code" })
+-- vim.keymap.set('n', '<leader>l', ':sp | terminal lua %<CR>',
+--   { noremap = true, silent = true, desc = "Run current Lua file in terminal" })
 
+-- Lua file execution (only in Lua files)
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "lua",
+  callback = function()
+    vim.keymap.set({'n', 'v'}, '<leader>r', ':luafile %<CR>',
+      { noremap = true, silent = true, buffer = true, desc = "Run current Lua file" })
+  end
+})
 
+-- TypeScript file execution (only in TypeScript files)
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "typescript",
+  callback = function()
+    vim.keymap.set('n', '<leader>r', ':!bun run dev<CR>',
+      { noremap = true, silent = true, buffer = true, desc = "Run current TypeScript file" })
+  end
+})
 ---------------------- packer ---------------------------
 local ensure_packer = function()
   local fn = vim.fn
   local install_path = fn.stdpath("data") .. "/site/pack/packer/start/packer.nvim"
   if fn.empty(fn.glob(install_path)) > 0 then
-    fn.system({ "git", "clone", "--depth", "1", 
+    fn.system({ "git", "clone", "--depth", "1",
                 "https://github.com/wbthomason/packer.nvim",
                 install_path
     })
@@ -88,13 +116,13 @@ require("packer").startup(function(use)
   use("EdenEast/nightfox.nvim")
   use("rebelot/kanagawa.nvim")
   use("rafi/awesome-vim-colorschemes")
-  
+
   -- lsp
-  use("neovim/nvim-lspconfig")              
+  use("neovim/nvim-lspconfig")
     use{  -- lsp progress bar
       "j-hui/fidget.nvim",
       config = function()
-        require("fidget").setup()
+        require("fidget").setup({})
       end
     }
     -- autocomplete
@@ -129,31 +157,30 @@ require("packer").startup(function(use)
   }
 
   -- line indents
-  use("lukas-reineke/indent-blankline.nvim")
-  local highlight = {
-      -- "CursorColumn",
-      "Whitespace",
-      "Function",
-      "Label",
-  }
-  local ibl = require('ibl')
-  ibl.setup {
-      enabled = false,
-      indent = { 
-        highlight = highlight,
-        char = "▏",
-        tab_char = {"a", "b"},
-      },
-      whitespace = {
-        highlight = highlight,
-        remove_blankline_trail = false,
-      },
-      scope = { enabled = false },
-  }
-  vim.keymap.set("n", "<leader>w", vim.cmd.IBLToggle,
-  { desc = "toggle indent guides" })
+  -- use("lukas-reineke/indent-blankline.nvim")
+  -- local highlight = {
+  --     -- "CursorColumn",
+  --     "Whitespace",
+  --     "Function",
+  --     "Label",
+  -- }
+  -- local ibl = require('ibl')
+  -- ibl.setup {
+  --     enabled = false,
+  --     indent = { 
+  --       highlight = highlight,
+  --       char = "▏",
+  --       tab_char = {"a", "b"},
+  --     },
+  --     whitespace = {
+  --       highlight = highlight,
+  --       remove_blankline_trail = false,
+  --     },
+  --     scope = { enabled = false },
+  -- }
+  -- vim.keymap.set("n", "<leader>w", vim.cmd.IBLToggle,
+  -- { desc = "toggle indent guides" })
 
-  
   -- git
   use("tpope/vim-fugitive")
   use {'lewis6991/gitsigns.nvim',
@@ -195,12 +222,21 @@ require("packer").startup(function(use)
   }
   require('lualine').setup {
     options = {
-      theme = "jellybeans"
+      theme = theme
     },
     sections = {
         lualine_a = {'mode'},
         lualine_b = {'branch', 'diff', 'diagnostics'},
-        lualine_c = {'filename'},
+        lualine_c =
+        {{
+            'filename',
+            file_status = true,
+            path=3,
+            symbols = {
+                modified = '[+]',
+                readonly = '[RO!]',
+            }
+        }},
         lualine_x = {'encoding', 'filetype'},
         lualine_y = { activelsp },
         lualine_z = {'progress'}
@@ -214,7 +250,15 @@ require("packer").startup(function(use)
         lualine_z = {}
     },
   }
-  
+
+  -- nvim dev lua stuff
+  use {
+    "folke/neodev.nvim",
+      config = function()
+        require("neodev").setup()
+      end,
+    }
+
   vim.opt.showmode = false
   if vim.fn.has("termguicolors") then
     vim.opt.termguicolors = true
@@ -233,6 +277,8 @@ local builtin = require('telescope.builtin')
 vim.keymap.set('n', '<C-p>', builtin.git_files, {})
 vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
 vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
+vim.keymap.set('n', '<C-f>', builtin.current_buffer_fuzzy_find, {})
+vim.keymap.set('n', '<leader>j', builtin.jumplist, {})
 -- vim.keymap.set('n', '
 
 local mark = require("harpoon.mark")
@@ -278,7 +324,7 @@ require("rust-tools").setup({
     },
   },
   server = {
-    on_attach = function(client, buffer)
+    on_attach = function(_, _)
     end,
     settings = {
       ["rust-analyzer"] = {
@@ -302,6 +348,39 @@ require("lspconfig").pyright.setup({
     }
   }
 })
+
+-- lua
+require('lspconfig').lua_ls.setup {
+  on_init = function(client)
+    if client.workspace_folders then
+      local path = client.workspace_folders[1].name
+      if path ~= vim.fn.stdpath('config') and (vim.loop.fs_stat(path..'/.luarc.json') or vim.loop.fs_stat(path..'/.luarc.jsonc')) then
+        return
+      end
+    end
+    client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
+      runtime = {
+        version = 'LuaJIT'
+      },
+      diagnostics = {
+        globals = {'vim'},
+      },
+      workspace = {
+        checkThirdParty = false,
+        -- This is the critical part:
+        library = vim.api.nvim_get_runtime_file("", true)
+      }
+    })
+  end,
+  settings = {
+    Lua = {}
+  }
+}
+
+
+
+
+
 -- lspconfig.pylsp.setup{
 --   settings = {
 --     pylsp = {
@@ -404,8 +483,8 @@ cmp.setup({
     ["<C-n>"] = cmp.mapping.select_next_item(),
     ["<S-Tab>"] = cmp.mapping.select_prev_item(),
     ["<Tab>"] = cmp.mapping.select_next_item(),
-    ["<C-d>"] = cmp.mapping.scroll_docs(-4),
-    ["<C-f>"] = cmp.mapping.scroll_docs(4),
+    -- ["<C-d>"] = cmp.mapping.scroll_docs(-4),
+    -- ["<C-f>"] = cmp.mapping.scroll_docs(4),
     ["<C-Space>"] = cmp.mapping.complete(),
     ["<C-e>"] = cmp.mapping.close(),
     ["<CR>"] = cmp.mapping.confirm({
@@ -473,6 +552,8 @@ end
 vim.api.nvim_set_keymap('n', '<Leader>gg', ':lua OpenGhci()<CR>', {noremap = true, silent = true})
 
 
+---------------------- custom plugins -------------------
+require('mother-nvim')
 
-
+-- write a haiku
 
