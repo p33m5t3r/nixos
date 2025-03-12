@@ -1,4 +1,3 @@
-It seems like you haven't provided a specific selection for to work with. Please highlight the text or code you me to modify, and I'll help you with it
 ---------------------- baseline options ----------------------
 local home = os.getenv("HOME")
 vim.opt.ignorecase = true
@@ -111,6 +110,39 @@ end
 
 require("packer").startup(function(use)
   use("wbthomason/packer.nvim")
+
+  -- treesitter
+  use {
+    'nvim-treesitter/nvim-treesitter',
+    run = function()
+      local ts_update = require('nvim-treesitter.install').update({ with_sync = true })
+      ts_update()
+    end,
+  }
+
+  use({
+  "lukas-reineke/headlines.nvim",
+  config = function()
+    require("headlines").setup {
+      markdown = {
+        headline_highlights = {"Headline1", "Headline2", "Headline3"},
+        codeblock_highlight = "CodeBlock",
+        quote_highlight = "Quote",
+        -- Enable concealing of code blocks
+        codeblock_concealer = true
+      }
+    }
+
+    -- Set conceallevel for markdown files
+    vim.api.nvim_create_autocmd("FileType", {
+      pattern = "markdown",
+      callback = function()
+        vim.opt_local.conceallevel = 2
+      end
+    })
+  end,
+  })
+
 
   -- colorschemes
   use("EdenEast/nightfox.nvim")
@@ -269,6 +301,51 @@ if packer_bootstrap then
   require("packer").sync()
 end
 
+require('nvim-treesitter.configs').setup {
+  modules = {},
+  ignore_install = {},
+
+  -- A list of parser names, or "all" (the listed parsers should be installed)
+  ensure_installed = { "c", "python", "haskell", "lua", "vim", "vimdoc", "query" },
+
+  -- Install parsers synchronously (only applied to `ensure_installed`)
+  sync_install = false,
+
+  -- Automatically install missing parsers
+  auto_install = true,
+
+  highlight = {
+    enable = true,
+
+    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+    -- Using this option may slow down your editor, and you may see some duplicate highlights.
+    -- Instead of true it can also be a list of languages
+    additional_vim_regex_highlighting = false,
+  },
+
+  indent = {
+    enable = true
+  },
+}
+
+-- Set folding based on treesitter
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+-- Start with all folds open
+vim.opt.foldenable = false
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "markdown",
+  callback = function()
+    -- Set conceallevel for markdown files (you already have this)
+    vim.opt_local.conceallevel = 2
+
+    -- Define conceal for code block fences
+    vim.fn.matchadd('Conceal', '```\\%(\\_s*\\w*\\)\\?', 10, -1, {conceal=''})
+  end
+})
+
 
 ------------------------ file jumping ----------------------------
 --- <C-v>	Go to file selection as a vsplit
@@ -376,10 +453,6 @@ require('lspconfig').lua_ls.setup {
     Lua = {}
   }
 }
-
-
-
-
 
 -- lspconfig.pylsp.setup{
 --   settings = {
@@ -553,7 +626,26 @@ vim.api.nvim_set_keymap('n', '<Leader>gg', ':lua OpenGhci()<CR>', {noremap = tru
 
 
 ---------------------- custom plugins -------------------
-require('mother-nvim')
+-- require('debug-plug')
+require('mother-nvim').setup()
 
--- write a haiku
+-- Visual mode mappings for LLM replace commands
+vim.keymap.set('v', '<Leader>lrc', ':LLMReplaceWithContext<CR>', { noremap = true, silent = true })
+vim.keymap.set('v', '<Leader>lrr', ':LLMReplace<CR>', { noremap = true, silent = true })
+
+-- Normal mode mappings for context management
+vim.keymap.set('n', '<Leader>lca', ':LLMAddFileToContext<CR>', { noremap = true })
+vim.keymap.set('n', '<Leader>lcr', ':LLMRemoveFileFromContext<CR>', { noremap = true })
+vim.keymap.set('n', '<Leader>lcl', ':LLMListContext<CR>', { noremap = true })
+
+-- Normal mode mappings for chatting
+vim.keymap.set('n', '<C-c>', ':LLMChat<CR>', { noremap = true })
+vim.keymap.set('n', '<Leader>llc', ':LLMChat<CR>', { noremap = true })
+vim.keymap.set('n', '<Leader>lls', ':LLMStop<CR>', { noremap = true })
+
+
+
+
+
+
 
