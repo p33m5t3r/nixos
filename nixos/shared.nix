@@ -1,39 +1,15 @@
-{ config, lib, pkgs, ... }:
-with lib;
-let
-  mkOutOfStoreSymlink = path:
-    let
-      pathStr = toString path;
-      name = baseNameOf pathStr;
-    in
-      pkgs.runCommandLocal name {} ''ln -s ${escapeShellArg pathStr} $out'';
-in {
+{ config, lib, pkgs, ... }: {
   imports = [ 
     ./modules/neovim
-    ./modules/python
-    ./modules/scripts
     ./modules/docker
+    # ./modules/python
+    # ./modules/scripts
+    # ./modules/cuda
   ];
-  modules.scripts = {
-    enable = true;
-    scriptsPath = "/home/anon/nixos/nixos/modules/scripts";
-  };
 
   nixpkgs.config.allowUnfree = true;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  home-manager = {
-    useGlobalPkgs = true;
-    users.anon = {
-      home.stateVersion = "24.11";
-      # home.file.".config/nvim/init.lua".source =
-      #  mkOutOfStoreSymlink ../.config/nvim/init.lua;
-      home.file.".config/swaylock".source = ../.config/swaylock;
-      home.file.".config/kitty".source = ../.config/kitty;
-      home.file.".config/waybar".source = ../.config/waybar;
-      home.file.".config/wofi".source = ../.config/wofi;
-    };
-  };
 
   # fierce tty setup
   i18n.defaultLocale = "en_US.UTF-8";
@@ -51,9 +27,9 @@ in {
   # };
 
   environment.systemPackages = with pkgs; [
+
     # graphical user programs
-    firefox google-chrome telegram-desktop
-    code-cursor spotify
+    firefox google-chrome telegram-desktop spotify
 
     # cli utils
     git wget psmisc htop ranger pciutils lshw tmux
@@ -64,13 +40,33 @@ in {
     # vanity
     neofetch pipes cmatrix cowsay
 
-    # claude pwa
-    (makeDesktopItem {
-      name = "claude";
-      exec = "google-chrome-stable --app=https://claude.ai";
-      desktopName = "claude";
-      categories = [ "Network" ];
-    })
+    # Global dev tools
+    gcc
+
+    # Python
+    python3 uv poetry pyright
+    python3Packages.ipython
+    
+    # JavaScript/TypeScript
+    nodejs_20 bun deno
+    nodePackages.pnpm
+    nodePackages.typescript
+    
+    # Rust
+    rustc cargo rust-analyzer
+    
+    # Hyprland (parallel install with Sway for migration)
+    hyprland
+    vanilla-dmz       # cursor icons
+    kitty             # terminal
+    waybar            # system bar
+    wofi              # dmenu but wayland
+    grim              # screenshots
+    slurp             # area selection w/ grim
+    hypridle          # idle management
+    swaybg            # wallpaper
+    brightnessctl     # brightness control
+    wl-clipboard      # clipboard
   ];
 
   boot.loader = {
@@ -82,17 +78,12 @@ in {
   time.timeZone = "America/Denver";
 
   fonts.packages = with pkgs; [
-    (nerdfonts.override { fonts = [ 
-      "FiraCode" 
-      "ProggyClean"
-      "BigBlueTerminal" 
-      ]; 
-    })
+    nerd-fonts.fira-code
   ];
 
   environment.sessionVariables = {
-    XDG_CURRENT_DESKTOP = "sway";
-    XDG_SESSION_DESKTOP = "sway";
+    XDG_CURRENT_DESKTOP = "Hyprland";
+    XDG_SESSION_DESKTOP = "Hyprland";
     XDG_SESSION_TYPE = "wayland";
   };
 
@@ -104,23 +95,7 @@ in {
   };
 
   services.dbus.enable = true;
-  programs.sway = {
-    enable = true;
-    wrapperFeatures.gtk = true;
-    extraPackages = with pkgs; [
-      swaylock          # screen lock
-      waybar            # system bar
-      wofi              # dmenu but wayland
-      kitty             # terminal
-      grim              # screenshots
-      slurp             # area selection w/ grim
-      swayidle          # idle management
-      brightnessctl     # brightness control
-      wl-clipboard      # clipboard
-    ];
-  };
-
-  hardware.pulseaudio.enable = true;
+  services.pulseaudio.enable = true;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;

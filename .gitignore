@@ -5,15 +5,4 @@ hardware-configuration.nix
 nixos/modules/scripts/*
 !nixos/modules/scripts/default.nix
 
-# ignore auto-gen'd dotfiles
-dconf/
-google-chrome/
-gtk-3.0/
-menus/
-neofetch/
-mimeapps.list
-pavucontrol.ini
-pulse/
-ranger/
-
 

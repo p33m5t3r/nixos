@@ -627,7 +627,7 @@ vim.api.nvim_set_keymap('n', '<Leader>gg', ':lua OpenGhci()<CR>', {noremap = tru
 
 ---------------------- custom plugins -------------------
 -- require('debug-plug')
-require('mother-nvim').setup()
+-- require('mother-nvim').setup()
 
 -- Visual mode mappings for LLM replace commands
 vim.keymap.set('v', '<Leader>lrc', ':LLMReplaceWithContext<CR>', { noremap = true, silent = true })

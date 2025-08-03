@@ -10,14 +10,13 @@
     "margin-left": 8,
 
     "modules-left": [
-        "sway/workspaces"
+        "hyprland/workspaces"
     ],
 
     "modules-center": [],
 
     "modules-right": [
         "tray",
-        "cpu_text",
         "cpu",
         "memory",
         "battery",
@@ -26,10 +25,12 @@
 	"clock"
     ],
 
-    "sway/workspaces": {
+    "hyprland/workspaces": {
         "disable-scroll": true,
         "all-outputs": true,
-        "tooltip": false
+        "tooltip": false,
+        "format": "{id}",
+        "on-click": "activate"
     },
 
     "tray": {
@@ -52,13 +53,14 @@
     },
 
     "memory": {
-        "format": "mem {percentage}%",
+        "format": "mem {used:0.1f}G/{total:0.0f}G",
         "interval": 2,
 
         "states": {
             "critical": 80
         }
     },
+
 
     "battery": {
         "format": "bat {capacity}%",
@@ -86,5 +88,6 @@
         "nospacing": 1,
         "on-click": "pavucontrol",
         "tooltip": false
-    }
-} 
+    },
+
+}
