@@ -36,13 +36,23 @@
         "--enable-features=UseOzonePlatform"
       ];
     })
-    telegram-desktop spotify
+    telegram-desktop 
+    (pkgs.symlinkJoin {
+      name = "spotify-wayland";
+      paths = [ pkgs.spotify ];
+      buildInputs = [ pkgs.makeWrapper ];
+      postBuild = ''
+        wrapProgram $out/bin/spotify \
+          --add-flags "--ozone-platform=wayland" \
+          --add-flags "--enable-features=UseOzonePlatform"
+      '';
+    })
 
     # cli utils
     git wget psmisc htop ranger pciutils lshw tmux
 
     # audio
-    pavucontrol pamixer
+    pavucontrol pamixer alsa-utils pulseaudio
 
     # vanity
     neofetch pipes cmatrix cowsay
@@ -74,6 +84,7 @@
     swaybg            # wallpaper
     brightnessctl     # brightness control
     wl-clipboard      # clipboard
+    swaylock          # screen locker
   ];
 
   boot.loader = {
@@ -86,6 +97,8 @@
 
   fonts.packages = with pkgs; [
     nerd-fonts.fira-code
+    noto-fonts
+    noto-fonts-emoji
   ];
 
   environment.sessionVariables = {
@@ -102,13 +115,26 @@
   };
 
   services.dbus.enable = true;
-  services.pulseaudio.enable = true;
   security.rtkit.enable = true;
+  security.pam.services.swaylock = {};
+  
+  # Power management - disable all suspend/sleep due to NVIDIA issues
+  services.logind = {
+    lidSwitch = "ignore";
+    powerKey = "ignore";
+    extraConfig = ''
+      HandleSuspendKey=ignore
+      HandleHibernateKey=ignore
+      HandleLidSwitch=ignore
+      IdleAction=ignore
+    '';
+  };
   services.pipewire = {
     enable = true;
-    jack.enable = false;
-    pulse.enable = false;
-    alsa.enable = false;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
+    jack.enable = true;
   };
 
   programs.bash = {
