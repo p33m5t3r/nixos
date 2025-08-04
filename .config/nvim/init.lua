@@ -86,6 +86,16 @@ vim.api.nvim_create_autocmd("FileType", {
       { noremap = true, silent = true, buffer = true, desc = "Run current TypeScript file" })
   end
 })
+
+-- same but haskell
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "haskell",
+  callback = function()
+    vim.keymap.set('n', '<leader>r', ':!runhaskell %<CR>', { buffer = true })
+  end,
+})
+
+
 ---------------------- packer ---------------------------
 local ensure_packer = function()
   local fn = vim.fn
@@ -120,28 +130,27 @@ require("packer").startup(function(use)
     end,
   }
 
-  use({
-  "lukas-reineke/headlines.nvim",
-  config = function()
-    require("headlines").setup {
-      markdown = {
-        headline_highlights = {"Headline1", "Headline2", "Headline3"},
-        codeblock_highlight = "CodeBlock",
-        quote_highlight = "Quote",
-        -- Enable concealing of code blocks
-        codeblock_concealer = true
-      }
-    }
+  -- use({
+  -- "lukas-reineke/headlines.nvim",
+  -- config = function()
+  --   require("headlines").setup {
+  --     markdown = {
+  --       codeblock_highlight = "CodeBlock",
+  --       quote_highlight = "Quote",
+  --       -- Enable concealing of code blocks
+  --       codeblock_concealer = true
+  --     }
+  --   }
 
-    -- Set conceallevel for markdown files
-    vim.api.nvim_create_autocmd("FileType", {
-      pattern = "markdown",
-      callback = function()
-        vim.opt_local.conceallevel = 2
-      end
-    })
-  end,
-  })
+  --   -- Set conceallevel for markdown files
+  --   vim.api.nvim_create_autocmd("FileType", {
+  --     pattern = "markdown",
+  --     callback = function()
+  --       vim.opt_local.conceallevel = 2
+  --     end
+  --   })
+  -- end,
+  -- })
 
 
   -- colorschemes
@@ -169,7 +178,7 @@ require("packer").startup(function(use)
   })
   use('hrsh7th/vim-vsnip')
 
-  use("simrat39/rust-tools.nvim")           -- ?
+  -- use("simrat39/rust-tools.nvim")           -- ?
   use("nvim-lua/popup.nvim")                -- ?
   use("theprimeagen/harpoon")
   -- file nav
@@ -178,14 +187,6 @@ require("packer").startup(function(use)
   use {
     'nvim-telescope/telescope.nvim',
     requires = { {'nvim-lua/plenary.nvim'} }
-  }
-
-  require('telescope').setup{
-    pickers = {
-      colorscheme = {
-        enable_preview = true
-      }
-    }
   }
 
   -- line indents
@@ -244,14 +245,8 @@ require("packer").startup(function(use)
     end
   })
 
-  use {                                     -- haskell
-      'mrcjkb/haskell-tools.nvim',
-      requires = {
-        'nvim-lua/plenary.nvim',
-        'nvim-telescope/telescope.nvim',    -- (optional)
-      },
-      branch = '1.x.x',
-  }
+  use('mrcjkb/haskell-tools.nvim')
+
   require('lualine').setup {
     options = {
       theme = theme
@@ -347,6 +342,25 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 
+local ht = require('haskell-tools')
+local ht_bufnr = vim.api.nvim_get_current_buf()
+local ht_opts = { noremap = true, silent = true, buffer = ht_bufnr }
+vim.keymap.set('n', '<leader>cr', vim.lsp.codelens.run, ht_opts)
+vim.keymap.set('n', '<leader>cs', ht.hoogle.hoogle_signature, ht_opts)
+vim.keymap.set('n', '<leader>cg', function()
+  ht.repl.toggle(vim.api.nvim_buf_get_name(0))
+end, ht_opts)
+vim.keymap.set('n', '<leader>cq', ht.repl.quit, ht_opts)
+
+local telescope = require('telescope').setup({
+    pickers = {
+      colorscheme = {
+        enable_preview = true
+      }
+    }
+  })
+require('telescope').load_extension('ht')
+
 ------------------------ file jumping ----------------------------
 --- <C-v>	Go to file selection as a vsplit
 --- <C-t>	Go to a file in a new tab
@@ -388,25 +402,41 @@ end)
 local lspconfig = require('lspconfig')
 
 -- rust
-require("rust-tools").setup({
-  tools = {
-    runnables = {
-      use_telescope = true,
-    },
-    inlay_hints = {
-      auto = true,
-      show_parameter_hints = false,
-      parameter_hints_prefix = "",
-      other_hints_prefix = "",
-    },
-  },
-  server = {
-    on_attach = function(_, _)
-    end,
-    settings = {
-      ["rust-analyzer"] = {
-        checkOnSave = {
-          command = "clippy",
+-- require("rust-tools").setup({
+--   tools = {
+--     runnables = {
+--       use_telescope = true,
+--     },
+--     -- inlay_hints = {
+--     --   auto = true,
+--     --   show_parameter_hints = false,
+--     --   parameter_hints_prefix = "",
+--     --   other_hints_prefix = "",
+--     -- },
+--   },
+--   server = {
+--     on_attach = function(_, _)
+--     end,
+--     settings = {
+--       ["rust-analyzer"] = {
+--         checkOnSave = {
+--           command = "clippy",
+--         },
+--       },
+--     },
+--   },
+-- })
+
+lspconfig.rust_analyzer.setup({
+  settings = {
+    ["rust-analyzer"] = {
+      checkOnSave = {
+        command = "clippy",
+      },
+      diagnostics = {
+        enable = true,
+        experimental = {
+          enable = true,
         },
       },
     },
@@ -507,7 +537,8 @@ lspconfig.clangd.setup{
 }
 
 -- haskell
-lspconfig.hls.setup{}
+-- lspconfig.hls.setup{}
+
 
 -- typescript
 lspconfig.ts_ls.setup{}
@@ -628,6 +659,7 @@ vim.api.nvim_set_keymap('n', '<Leader>gg', ':lua OpenGhci()<CR>', {noremap = tru
 ---------------------- custom plugins -------------------
 -- require('debug-plug')
 -- require('mother-nvim').setup()
+require('torchfix').setup()
 
 -- Visual mode mappings for LLM replace commands
 vim.keymap.set('v', '<Leader>lrc', ':LLMReplaceWithContext<CR>', { noremap = true, silent = true })
