@@ -29,7 +29,14 @@
   environment.systemPackages = with pkgs; [
 
     # graphical user programs
-    firefox google-chrome telegram-desktop spotify
+    firefox 
+    (google-chrome.override {
+      commandLineArgs = [
+        "--ozone-platform=wayland"
+        "--enable-features=UseOzonePlatform"
+      ];
+    })
+    telegram-desktop spotify
 
     # cli utils
     git wget psmisc htop ranger pciutils lshw tmux
@@ -144,13 +151,19 @@
   };
 
   services.libinput.enable = true;
-  services.openssh.enable = true;
+  services.openssh = {
+    enable = true;
+    settings = {
+      PasswordAuthentication = false;
+      PermitRootLogin = "no";
+      PubkeyAuthentication = true;
+    };
+  };
   programs.ssh.startAgent = true;
 
   users.users.anon = {
     isNormalUser = true;
     extraGroups = ["wheel" "networkmanager" "audio"];
-    initialPassword = "anon";
   };
 
   security.sudo.extraConfig = ''

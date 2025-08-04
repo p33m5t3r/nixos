@@ -1,13 +1,15 @@
+[
 {
+    "output": "DP-1",
     "layer": "top",
     "position": "bottom",
     "spacing": 0,
     "height": 0,
 
-    "margin-top": 2,
-    "margin-right": 8,
+    "margin-top": 0,
+    "margin-right": 0,
     "margin-bottom": 0,
-    "margin-left": 8,
+    "margin-left": 0,
 
     "modules-left": [
         "hyprland/workspaces"
@@ -27,7 +29,7 @@
 
     "hyprland/workspaces": {
         "disable-scroll": true,
-        "all-outputs": true,
+        "all-outputs": false,
         "tooltip": false,
         "format": "{id}",
         "on-click": "activate"
@@ -60,8 +62,6 @@
             "critical": 80
         }
     },
-
-
     "battery": {
         "format": "bat {capacity}%",
         "interval": 5,
@@ -88,6 +88,38 @@
         "nospacing": 1,
         "on-click": "pavucontrol",
         "tooltip": false
+    }
+},
+{
+    "output": "HDMI-A-1",
+    "layer": "top",
+    "position": "bottom",
+    "spacing": 0,
+    "height": 0,
+
+    "margin-top": 0,
+    "margin-right": 0,
+    "margin-bottom": 0,
+    "margin-left": 0,
+
+    "modules-left": [
+        "hyprland/workspaces"
+    ],
+
+    "modules-center": [],
+
+    "modules-right": ["clock"],
+    "clock": {
+        "format": "{:%I:%M %p}",
+        "tooltip": false
     },
 
+    "hyprland/workspaces": {
+        "disable-scroll": true,
+        "all-outputs": false,
+        "tooltip": false,
+        "format": "{id}",
+        "on-click": "activate"
+    }
 }
+]

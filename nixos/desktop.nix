@@ -1,7 +1,7 @@
 { config, pkgs, ... }: {
 
-  boot.loader.efi.efiSysMountPoint = "/boot/efi";
-  networking.hostName = "desktop";
+  # boot.loader.efi.efiSysMountPoint = "/boot/efi";
+  networking.hostName = "nixbox";
   
   imports = [ ./modules/nvda/desktop.nix ];
 

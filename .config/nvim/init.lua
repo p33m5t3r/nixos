@@ -30,7 +30,10 @@ vim.cmd([[
 local theme = 'nordfox'
 local set_colorscheme = function(mode)
   if mode == 'light' then theme = 'dayfox' end
-  vim.cmd(string.format("colorscheme %s", theme))
+  local ok, _ = pcall(vim.cmd, string.format("colorscheme %s", theme))
+  if not ok then
+    vim.cmd("colorscheme default")
+  end
 end
 set_colorscheme(os.getenv('COLORCONFIG'))
 
