@@ -11,13 +11,13 @@
           inherit system;
           config.allowUnfree = true;
         };
-        py = pkgs.python3Packages;
+        py = pkgs.python312Packages;
       in
       {
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
             # Python core
-            python3
+            python312
             uv
             py.ipython
             py.python-lsp-server
@@ -35,11 +35,14 @@
             # System libs
             stdenv.cc.cc
             zlib
+            pkg-config
+            cmake
+            ffmpeg_6  # for torchvision
           ];
           
           shellHook = ''
             export CUDA_PATH=${pkgs.cudatoolkit}
-            export LD_LIBRARY_PATH=${pkgs.linuxPackages.nvidia_x11_production}/lib:${pkgs.stdenv.cc.cc.lib}/lib:${pkgs.cudaPackages.cuda_cudart}/lib:${pkgs.cudaPackages.cudnn}/lib
+            export LD_LIBRARY_PATH=${pkgs.linuxPackages.nvidia_x11_production}/lib:${pkgs.stdenv.cc.cc.lib}/lib:${pkgs.cudaPackages.cuda_cudart}/lib:${pkgs.cudaPackages.cudnn}/lib:${pkgs.ffmpeg_6}/lib
             export EXTRA_LDFLAGS="-L/lib -L${pkgs.linuxPackages.nvidia_x11_production}/lib"
             export EXTRA_CCFLAGS="-I/usr/include"
             
