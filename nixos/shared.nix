@@ -68,9 +68,17 @@
     nodejs_20 bun deno
     nodePackages.pnpm
     nodePackages.typescript
+
+    # lua
+    lua-language-server
     
     # Rust
     rustc cargo rust-analyzer
+    
+    # LaTeX
+    tree-sitter
+    texlive.combined.scheme-full
+    zathura
     
     # Hyprland (parallel install with Sway for migration)
     hyprland

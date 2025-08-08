@@ -183,7 +183,13 @@ require("packer").startup(function(use)
 
   -- use("simrat39/rust-tools.nvim")           -- ?
   use("nvim-lua/popup.nvim")                -- ?
-  use("theprimeagen/harpoon")
+  -- use("ThePrimeagen/harpoon")
+  use("nvim-lua/plenary.nvim")
+  use {
+      "ThePrimeagen/harpoon",
+      branch = "harpoon2",
+      requires = { {"nvim-lua/plenary.nvim"} }
+  }
   -- file nav
   -- use("nvim-lua/plenary.nvim")
   -- use("nvim-telescope/telescope.nvim")
@@ -299,6 +305,37 @@ if packer_bootstrap then
   require("packer").sync()
 end
 
+-- vimtex configuration
+vim.g.vimtex_view_method = 'zathura'
+vim.g.vimtex_compiler_method = 'latexmk'
+vim.g.vimtex_compiler_latexmk = {
+    options = {
+        '-pdf',
+        '-shell-escape',
+        '-verbose',
+        '-file-line-error',
+        '-synctex=1',
+        '-interaction=nonstopmode',
+    },
+}
+vim.g.vimtex_quickfix_mode = 0
+vim.g.tex_flavor = 'latex'
+-- Disable ALL concealment to prevent crashes
+-- vim.g.vimtex_syntax_conceal_enable = 0
+-- vim.g.tex_conceal = ''
+
+-- vimtex keybindings
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "tex",
+  callback = function()
+    vim.keymap.set('n', '<leader>ll', ':VimtexCompile<CR>', { buffer = true, desc = "Compile LaTeX" })
+    vim.keymap.set('n', '<leader>lv', ':VimtexView<CR>', { buffer = true, desc = "View PDF" })
+    vim.keymap.set('n', '<leader>lc', ':VimtexClean<CR>', { buffer = true, desc = "Clean aux files" })
+    vim.keymap.set('n', '<leader>le', ':VimtexErrors<CR>', { buffer = true, desc = "Show errors" })
+    vim.keymap.set('n', '<leader>lt', ':VimtexTocToggle<CR>', { buffer = true, desc = "Toggle TOC" })
+  end
+})
+
 require('nvim-treesitter.configs').setup {
   modules = {},
   ignore_install = {},
@@ -314,6 +351,7 @@ require('nvim-treesitter.configs').setup {
 
   highlight = {
     enable = true,
+    disable = { "latex", "tex" },  -- Let VimTeX handle LaTeX syntax
 
     -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
     -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
@@ -363,7 +401,6 @@ local telescope = require('telescope').setup({
     }
   })
 require('telescope').load_extension('ht')
-
 ------------------------ file jumping ----------------------------
 --- <C-v>	Go to file selection as a vsplit
 --- <C-t>	Go to a file in a new tab
@@ -375,14 +412,14 @@ vim.keymap.set('n', '<C-f>', builtin.current_buffer_fuzzy_find, {})
 vim.keymap.set('n', '<leader>j', builtin.jumplist, {})
 -- vim.keymap.set('n', '
 
-local mark = require("harpoon.mark")
-local ui = require("harpoon.ui")
-vim.keymap.set('n', '<leader>a', mark.add_file)
-vim.keymap.set('n', '<leader>h', ui.toggle_quick_menu)
-vim.keymap.set('n', '<leader>g1', function () ui.nav_file(1) end)
-vim.keymap.set('n', '<leader>g2', function () ui.nav_file(2) end)
-vim.keymap.set('n', '<leader>g3', function () ui.nav_file(3) end)
-vim.keymap.set('n', '<leader>g4', function () ui.nav_file(4) end)
+local harpoon = require("harpoon")
+harpoon:setup()
+vim.keymap.set('n', '<leader>a', function() harpoon:list():add() end)
+vim.keymap.set('n', '<C-h>', function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
+vim.keymap.set('n', '<leader>g1', function () harpoon:list():select(1) end)
+vim.keymap.set('n', '<leader>g2', function () harpoon:list():select(2) end)
+vim.keymap.set('n', '<leader>g3', function () harpoon:list():select(3) end)
+vim.keymap.set('n', '<leader>g4', function () harpoon:list():select(4) end)
 
 local gitsigns = require('gitsigns')
 vim.keymap.set("n", "<leader>gt", function()
