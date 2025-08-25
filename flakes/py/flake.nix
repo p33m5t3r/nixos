@@ -25,6 +25,8 @@
             # CUDA/NVIDIA
             cudatoolkit
             linuxPackages.nvidia_x11_production
+            # pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu128
+
             
             # Additional CUDA packages that torch might need
             cudaPackages.cuda_cudart

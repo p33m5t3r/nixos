@@ -84,6 +84,7 @@
         "scroll-step": 5,
         "max-volume": 150,
         "format": "vol {volume}%",
+        "format-muted": "MUTED {volume}%",
         "format-bluetooth": "vol {volume}%",
         "nospacing": 1,
         "on-click": "pavucontrol",

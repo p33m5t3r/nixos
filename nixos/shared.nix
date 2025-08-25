@@ -1,6 +1,6 @@
 { config, lib, pkgs, ... }: {
   imports = [ 
-    ./modules/neovim
+    # ./modules/neovim
     ./modules/docker
     # ./modules/python
     # ./modules/scripts
@@ -19,15 +19,7 @@
     useXkbConfig = true;
   };
 
-  # programs.steam = {
-  #   enable = true;
-  #   remotePlay.openFirewall = true;
-  #   dedicatedServer.openFirewall = true;
-  #   localNetworkGameTransfers.openFirewall = true;
-  # };
-
   environment.systemPackages = with pkgs; [
-
     # graphical user programs
     firefox 
     (google-chrome.override {
@@ -93,7 +85,18 @@
     brightnessctl     # brightness control
     wl-clipboard      # clipboard
     swaylock          # screen locker
+
+    # neovim
+    neovim
+    ripgrep
   ];
+
+  programs.neovim = {
+    enable = true;
+    defaultEditor = true;
+    viAlias = true;
+    vimAlias = true;
+  };
 
   boot.loader = {
     systemd-boot.enable = true;
@@ -126,17 +129,6 @@
   security.rtkit.enable = true;
   security.pam.services.swaylock = {};
   
-  # Power management - disable all suspend/sleep due to NVIDIA issues
-  services.logind = {
-    lidSwitch = "ignore";
-    powerKey = "ignore";
-    extraConfig = ''
-      HandleSuspendKey=ignore
-      HandleHibernateKey=ignore
-      HandleLidSwitch=ignore
-      IdleAction=ignore
-    '';
-  };
   services.pipewire = {
     enable = true;
     alsa.enable = true;
