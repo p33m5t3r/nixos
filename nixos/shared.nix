@@ -1,10 +1,6 @@
 { config, lib, pkgs, ... }: {
   imports = [ 
-    # ./modules/neovim
     ./modules/docker
-    # ./modules/python
-    # ./modules/scripts
-    # ./modules/cuda
   ];
 
   nixpkgs.config.allowUnfree = true;
