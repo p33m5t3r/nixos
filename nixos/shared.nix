@@ -35,6 +35,8 @@
           --add-flags "--enable-features=UseOzonePlatform"
       '';
     })
+    discord-ptb
+    mako
 
     # cli utils
     git wget psmisc htop ranger pciutils lshw tmux
@@ -47,8 +49,11 @@
 
     # Global dev tools
     gcc
+    cmake
+    gnumake
 
     # Python
+    graphviz
     python3 uv poetry pyright
     python3Packages.ipython
     
@@ -62,6 +67,9 @@
     
     # Rust
     rustc cargo rust-analyzer
+
+    # C
+    clang-tools
     
     # LaTeX
     tree-sitter
@@ -85,6 +93,7 @@
     # neovim
     neovim
     ripgrep
+
   ];
 
   programs.neovim = {

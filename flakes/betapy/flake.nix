@@ -1,5 +1,5 @@
 {
-  description = "Simple Python development environment";
+  description = "python ml dev env w/ beta drivers";
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
@@ -24,7 +24,7 @@
             
             # CUDA/NVIDIA
             cudatoolkit
-            linuxPackages.nvidia_x11_production
+            linuxPackages.nvidia_x11_beta
             # pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu128
 
             
@@ -44,8 +44,8 @@
           
           shellHook = ''
             export CUDA_PATH=${pkgs.cudatoolkit}
-            export LD_LIBRARY_PATH=${pkgs.linuxPackages.nvidia_x11_production}/lib:${pkgs.stdenv.cc.cc.lib}/lib:${pkgs.cudaPackages.cuda_cudart}/lib:${pkgs.cudaPackages.cudnn}/lib:${pkgs.ffmpeg_6}/lib:${pkgs.zlib}/lib
-            export EXTRA_LDFLAGS="-L/lib -L${pkgs.linuxPackages.nvidia_x11_production}/lib"
+            export LD_LIBRARY_PATH=${pkgs.linuxPackages.nvidia_x11_beta}/lib:${pkgs.stdenv.cc.cc.lib}/lib:${pkgs.cudaPackages.cuda_cudart}/lib:${pkgs.cudaPackages.cudnn}/lib:${pkgs.ffmpeg_6}/lib:${pkgs.zlib}/lib
+            export EXTRA_LDFLAGS="-L/lib -L${pkgs.linuxPackages.nvidia_x11_beta}/lib"
             export EXTRA_CCFLAGS="-I/usr/include"
             
             # Additional CUDA env vars that torch might look for
@@ -54,7 +54,7 @@
             export CUDNN_PATH=${pkgs.cudaPackages.cudnn}
 
             # triton
-            export TRITON_LIBCUDA_PATH="${pkgs.linuxPackages.nvidia_x11_production}/lib/libcuda.so"
+            export TRITON_LIBCUDA_PATH="${pkgs.linuxPackages.nvidia_x11_beta}/lib/libcuda.so"
             export TRITON_LIBDEVICE_PATH="${pkgs.cudatoolkit}/nvvm/libdevice"
           '';
         };

@@ -1,6 +1,11 @@
 { config, pkgs, ... }:
 
 {
+  # services.xserver.enable = true;
+
+  programs.gamemode.enable = true;
+  programs.java.enable = true;
+
   programs.steam = {
     enable = true;
     remotePlay.openFirewall = true;
@@ -17,6 +22,7 @@
   programs.xwayland.enable = true;
 
   environment.systemPackages = with pkgs; [
+    prismlauncher
     gamescope
     gamemode
     mangohud

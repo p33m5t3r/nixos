@@ -4,13 +4,16 @@
   networking.hostName = "nixbox";
  
   # normal config
-  imports = [ ./modules/nvda/desktop.nix ];
-
-  # gaming config
   # imports = [ 
-  #   ./modules/nvda/beta.nix 
+  #   ./modules/nvda/desktop.nix 
   #   ./modules/games/default.nix
   # ];
+
+  # gaming config
+  imports = [ 
+    ./modules/nvda/beta.nix 
+    ./modules/games/default.nix
+  ];
 
 # Power management - disable all suspend/sleep due to NVIDIA issues
   services.logind = {

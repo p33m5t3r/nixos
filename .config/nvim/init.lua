@@ -17,6 +17,7 @@ vim.opt.termguicolors = true
 vim.opt.scrolloff = 8
 vim.opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
 vim.opt.undofile = true
+vim.opt.cmdheight = 1
 vim.cmd([[
   autocmd FileType lua setlocal shiftwidth=2 softtabstop=2
   autocmd FileType nix setlocal shiftwidth=2 softtabstop=2
@@ -34,6 +35,12 @@ local set_colorscheme = function(mode)
   if not ok then
     vim.cmd("colorscheme default")
   end
+
+  -- local is_tty = os.getenv('TERM') == 'tmux-256color'
+  -- if is_tty then
+  --     vim.cmd("colorscheme elflord") -- ron, murphy, 
+  -- end
+
 end
 set_colorscheme(os.getenv('COLORCONFIG'))
 
@@ -57,6 +64,10 @@ vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle,
 { desc = "Toggle undotree" })
 vim.keymap.set("n", "<leader>fb", vim.cmd.Ex,
 { desc = "Open netrw explorer" })
+
+vim.keymap.set("n", "<leader>fm", function () vim.lsp.buf.format() end,
+{ desc = "invoke lsp formatter" })
+
 vim.keymap.set("n", "<leader>cc", function()
     local current_cc = vim.wo.colorcolumn
     if current_cc == "" then
@@ -71,6 +82,20 @@ vim.keymap.set('n', '<leader>x', 'V"zy<cmd>lua load(vim.fn.getreg("z"))()<CR>',
 { noremap = true, silent = true, desc = "Execute current line as Lua code" })
 -- vim.keymap.set('n', '<leader>l', ':sp | terminal lua %<CR>',
 --   { noremap = true, silent = true, desc = "Run current Lua file in terminal" })
+
+-- Completely nuke treesitter for markdown at runtime
+-- vim.api.nvim_create_autocmd("FileType", {
+--   pattern = { "markdown" },
+--   callback = function()
+--     local buf = vim.api.nvim_get_current_buf()
+--     -- Stop any treesitter activity
+--     pcall(vim.treesitter.stop, buf)
+--     -- Force traditional syntax
+--     vim.bo[buf].syntax = "markdown"
+--     -- Disable concealing
+--     vim.wo.conceallevel = 0
+--   end,
+-- })
 
 -- Lua file execution (only in Lua files)
 vim.api.nvim_create_autocmd("FileType", {
@@ -98,6 +123,13 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
+-- same but C
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "c",
+  callback = function()
+    vim.keymap.set('n', '<leader>rr', ':!./run.sh %<CR>', { buffer = true })
+  end,
+})
 
 ---------------------- packer ---------------------------
 local ensure_packer = function()
@@ -338,9 +370,10 @@ vim.api.nvim_create_autocmd("FileType", {
 
 require('nvim-treesitter.configs').setup {
   modules = {},
-  ignore_install = {},
 
   -- A list of parser names, or "all" (the listed parsers should be installed)
+  -- ignore_install = { "markdown", "markdown_inline" },
+  ignore_install = {},
   ensure_installed = { "c", "python", "haskell", "lua", "vim", "vimdoc", "query" },
 
   -- Install parsers synchronously (only applied to `ensure_installed`)
@@ -351,7 +384,8 @@ require('nvim-treesitter.configs').setup {
 
   highlight = {
     enable = true,
-    disable = { "latex", "tex" },  -- Let VimTeX handle LaTeX syntax
+    -- disable = { "markdown", "markdown_inline", "latex", "tex" },  -- Let VimTeX handle LaTeX syntax
+    disable = {"latex", "tex" },
 
     -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
     -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
@@ -361,7 +395,8 @@ require('nvim-treesitter.configs').setup {
   },
 
   indent = {
-    enable = true
+    enable = true,
+    -- disable = { "markdown", "markdown_inline" }
   },
 }
 
@@ -371,16 +406,16 @@ vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
 -- Start with all folds open
 vim.opt.foldenable = false
 
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "markdown",
-  callback = function()
-    -- Set conceallevel for markdown files (you already have this)
-    vim.opt_local.conceallevel = 2
-
-    -- Define conceal for code block fences
-    vim.fn.matchadd('Conceal', '```\\%(\\_s*\\w*\\)\\?', 10, -1, {conceal=''})
-  end
-})
+-- vim.api.nvim_create_autocmd("FileType", {
+--   pattern = "markdown",
+--   callback = function()
+--     -- Set conceallevel for markdown files (you already have this)
+--     vim.opt_local.conceallevel = 2
+-- 
+--     -- Define conceal for code block fences
+--     vim.fn.matchadd('Conceal', '```\\%(\\_s*\\w*\\)\\?', 10, -1, {conceal=''})
+--   end
+-- })
 
 
 local ht = require('haskell-tools')
@@ -441,7 +476,6 @@ end)
 ------------------------ LSP config ----------------------------
 local lspconfig = require('lspconfig')
 
--- rust
 -- require("rust-tools").setup({
 --   tools = {
 --     runnables = {
@@ -467,10 +501,11 @@ local lspconfig = require('lspconfig')
 --   },
 -- })
 
+-- rust
 lspconfig.rust_analyzer.setup({
   settings = {
     ["rust-analyzer"] = {
-      checkOnSave = {
+      check = {
         command = "clippy",
       },
       diagnostics = {

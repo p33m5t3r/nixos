@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+import time
+import os
+import sys
+
+def clear_screen():
+    os.system('clear' if os.name == 'posix' else 'cls')
+
+def get_terminal_size():
+    try:
+        rows, cols = os.popen('stty size', 'r').read().split()
+        return int(rows), int(cols)
+    except:
+        return 24, 80  # Default size
+
+def format_time(seconds):
+    hours = seconds // 3600
+    minutes = (seconds % 3600) // 60
+    secs = seconds % 60
+    return f"{hours:02d}:{minutes:02d}:{secs:02d}"
+
+def main():
+    seconds = 0
+    
+    try:
+        while True:
+            clear_screen()
+            rows, cols = get_terminal_size()
+            
+            time_str = format_time(seconds)
+            
+            # Calculate center position
+            row_pos = rows // 2
+            col_pos = (cols - len(time_str)) // 2
+            
+            # Move cursor to center and print timer
+            sys.stdout.write(f"\033[{row_pos};{col_pos}H{time_str}")
+            sys.stdout.flush()
+            
+            time.sleep(1)
+            seconds += 1
+            
+    except KeyboardInterrupt:
+        clear_screen()
+        print("\nTimer stopped.")
+
+if __name__ == "__main__":
+    main()
