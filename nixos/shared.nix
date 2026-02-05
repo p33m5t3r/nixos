@@ -185,6 +185,23 @@
   };
 
   services.libinput.enable = true;
+
+  # Bluetooth configuration
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;  # Enable Bluetooth on boot
+    settings = {
+      General = {
+        Enable = "Source,Sink,Media,Socket";  # Enable A2DP profiles
+        Experimental = true;  # Enable experimental features (better codec support)
+        AutoConnect = true;  # Automatically reconnect to paired devices
+        FastConnectable = true;  # Faster connection for known devices
+        RememberPowered = true;  # Remember power state across reboots
+      };
+    };
+  };
+  services.blueman.enable = true;  # GUI manager (optional - remove if you don't want it)
+
   services.openssh = {
     enable = true;
     settings = {

@@ -419,15 +419,15 @@ vim.opt.foldenable = false
 -- })
 
 
-local ht = require('haskell-tools')
-local ht_bufnr = vim.api.nvim_get_current_buf()
-local ht_opts = { noremap = true, silent = true, buffer = ht_bufnr }
-vim.keymap.set('n', '<leader>cr', vim.lsp.codelens.run, ht_opts)
-vim.keymap.set('n', '<leader>cs', ht.hoogle.hoogle_signature, ht_opts)
-vim.keymap.set('n', '<leader>cg', function()
-  ht.repl.toggle(vim.api.nvim_buf_get_name(0))
-end, ht_opts)
-vim.keymap.set('n', '<leader>cq', ht.repl.quit, ht_opts)
+-- local ht = require('haskell-tools')
+-- local ht_bufnr = vim.api.nvim_get_current_buf()
+-- local ht_opts = { noremap = true, silent = true, buffer = ht_bufnr }
+-- vim.keymap.set('n', '<leader>cr', vim.lsp.codelens.run, ht_opts)
+-- vim.keymap.set('n', '<leader>cs', ht.hoogle.hoogle_signature, ht_opts)
+-- vim.keymap.set('n', '<leader>cg', function()
+--   ht.repl.toggle(vim.api.nvim_buf_get_name(0))
+-- end, ht_opts)
+-- vim.keymap.set('n', '<leader>cq', ht.repl.quit, ht_opts)
 
 local telescope = require('telescope').setup({
     pickers = {
@@ -735,7 +735,7 @@ vim.api.nvim_set_keymap('n', '<Leader>gg', ':lua OpenGhci()<CR>', {noremap = tru
 ---------------------- custom plugins -------------------
 -- require('debug-plug')
 -- require('mother-nvim').setup()
-require('torchfix').setup()
+-- require('torchfix').setup()
 
 -- Visual mode mappings for LLM replace commands
 vim.keymap.set('v', '<Leader>lrc', ':LLMReplaceWithContext<CR>', { noremap = true, silent = true })
