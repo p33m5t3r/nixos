@@ -48,9 +48,12 @@
     neofetch pipes cmatrix cowsay
 
     # Global dev tools
+    direnv
     gcc
     cmake
     gnumake
+    man-pages
+    man-pages-posix
 
     # Python
     graphviz

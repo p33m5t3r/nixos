@@ -22,6 +22,7 @@ vim.cmd([[
   autocmd FileType lua setlocal shiftwidth=2 softtabstop=2
   autocmd FileType nix setlocal shiftwidth=2 softtabstop=2
   autocmd FileType python setlocal shiftwidth=4 softtabstop=4
+  autocmd FileType typescriptreact,typescript setlocal shiftwidth=2 softtabstop=2
 ]])
 
 
