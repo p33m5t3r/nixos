@@ -29,7 +29,7 @@ vim.cmd([[
 ---------------------- colorscheme ----------------------
 -- vim.cmd("colorscheme peachpuff")
 
-local theme = 'nordfox'
+local theme = 'carbonfox'
 local set_colorscheme = function(mode)
   if mode == 'light' then theme = 'dayfox' end
   local ok, _ = pcall(vim.cmd, string.format("colorscheme %s", theme))
@@ -65,9 +65,32 @@ vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle,
 { desc = "Toggle undotree" })
 vim.keymap.set("n", "<leader>fb", vim.cmd.Ex,
 { desc = "Open netrw explorer" })
+vim.keymap.set("n", "<leader>nn", ":NERDTreeToggle<CR>",
+{ silent = true, desc = "Toggle NERDTree" })
+vim.keymap.set("n", "<leader>nr", ":NERDTreeRefresh<CR>",
+{ silent = true, desc = "Refresh NERDTree" })
 
 vim.keymap.set("n", "<leader>fm", function () vim.lsp.buf.format() end,
 { desc = "invoke lsp formatter" })
+
+vim.keymap.set("n", "<leader>yp", function()
+  local abs = vim.fn.expand("%:p")
+  if abs == "" then
+    vim.notify("no file in buffer", vim.log.levels.WARN)
+    return
+  end
+  local root = vim.fn.systemlist({
+    "git", "-C", vim.fn.fnamemodify(abs, ":h"), "rev-parse", "--show-toplevel"
+  })[1]
+  if vim.v.shell_error ~= 0 or not root or root == "" then
+    vim.notify("not in a git repo", vim.log.levels.WARN)
+    return
+  end
+  local rel = abs:sub(#root + 2)
+  vim.fn.setreg("+", rel)
+  vim.fn.setreg('"', rel)
+  vim.notify("yanked: " .. rel)
+end, { desc = "Yank buffer path relative to git root" })
 
 vim.keymap.set("n", "<leader>cc", function()
     local current_cc = vim.wo.colorcolumn
@@ -223,6 +246,7 @@ require("packer").startup(function(use)
       branch = "harpoon2",
       requires = { {"nvim-lua/plenary.nvim"} }
   }
+
   -- file nav
   -- use("nvim-lua/plenary.nvim")
   -- use("nvim-telescope/telescope.nvim")
@@ -232,29 +256,29 @@ require("packer").startup(function(use)
   }
 
   -- line indents
-  -- use("lukas-reineke/indent-blankline.nvim")
-  -- local highlight = {
-  --     -- "CursorColumn",
-  --     "Whitespace",
-  --     "Function",
-  --     "Label",
-  -- }
-  -- local ibl = require('ibl')
-  -- ibl.setup {
-  --     enabled = false,
-  --     indent = { 
-  --       highlight = highlight,
-  --       char = "▏",
-  --       tab_char = {"a", "b"},
-  --     },
-  --     whitespace = {
-  --       highlight = highlight,
-  --       remove_blankline_trail = false,
-  --     },
-  --     scope = { enabled = false },
-  -- }
-  -- vim.keymap.set("n", "<leader>w", vim.cmd.IBLToggle,
-  -- { desc = "toggle indent guides" })
+  use("lukas-reineke/indent-blankline.nvim")
+  local highlight = {
+      -- "CursorColumn",
+      "Whitespace",
+      "Function",
+      "Label",
+  }
+  local ibl = require('ibl')
+  ibl.setup {
+      enabled = false,
+      indent = {
+        highlight = highlight,
+        char = "▏",
+        tab_char = {"a", "b"},
+      },
+      whitespace = {
+        highlight = highlight,
+        remove_blankline_trail = false,
+      },
+      scope = { enabled = false },
+  }
+  vim.keymap.set("n", "<leader>w", vim.cmd.IBLToggle,
+  { desc = "toggle indent guides" })
 
   -- git
   use("tpope/vim-fugitive")
@@ -300,7 +324,7 @@ require("packer").startup(function(use)
         {{
             'filename',
             file_status = true,
-            path=3,
+            path=1,
             symbols = {
                 modified = '[+]',
                 readonly = '[RO!]',
@@ -311,11 +335,21 @@ require("packer").startup(function(use)
         lualine_z = {'progress'}
     },
     inactive_sections = {
-        lualine_a = {'branch'},
-        lualine_b = {},
+        -- lualine_a = {'branch'},
+        lualine_a = {},
+        lualine_b = {{
+            'filename',
+            file_status = true,
+            path=1,
+            symbols = {
+                modified = '[+]',
+                readonly = '[RO!]',
+            }
+        }},
         lualine_c = {},
         lualine_x = {},
-        lualine_y = {'windows'},
+        -- lualine_y = {'windows'},
+        lualine_y = {},
         lualine_z = {}
     },
   }
@@ -369,37 +403,18 @@ vim.api.nvim_create_autocmd("FileType", {
   end
 })
 
-require('nvim-treesitter.configs').setup {
-  modules = {},
+require('nvim-treesitter').setup()
 
-  -- A list of parser names, or "all" (the listed parsers should be installed)
-  -- ignore_install = { "markdown", "markdown_inline" },
-  ignore_install = {},
-  ensure_installed = { "c", "python", "haskell", "lua", "vim", "vimdoc", "query" },
-
-  -- Install parsers synchronously (only applied to `ensure_installed`)
-  sync_install = false,
-
-  -- Automatically install missing parsers
-  auto_install = true,
-
-  highlight = {
-    enable = true,
-    -- disable = { "markdown", "markdown_inline", "latex", "tex" },  -- Let VimTeX handle LaTeX syntax
-    disable = {"latex", "tex" },
-
-    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
-    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
-    -- Using this option may slow down your editor, and you may see some duplicate highlights.
-    -- Instead of true it can also be a list of languages
-    additional_vim_regex_highlighting = false,
-  },
-
-  indent = {
-    enable = true,
-    -- disable = { "markdown", "markdown_inline" }
-  },
-}
+-- Enable treesitter highlighting (built-in neovim, new API)
+vim.api.nvim_create_autocmd("FileType", {
+  callback = function(args)
+    local ft = vim.bo[args.buf].filetype
+    local disabled = { latex = true, tex = true }
+    if not disabled[ft] then
+      pcall(vim.treesitter.start, args.buf)
+    end
+  end,
+})
 
 -- Set folding based on treesitter
 vim.opt.foldmethod = "expr"
@@ -443,19 +458,19 @@ require('telescope').load_extension('ht')
 local builtin = require('telescope.builtin')
 vim.keymap.set('n', '<C-p>', builtin.git_files, {})
 vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
-vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
-vim.keymap.set('n', '<C-f>', builtin.current_buffer_fuzzy_find, {})
+vim.keymap.set('n', '<leader>fg', builtin.current_buffer_fuzzy_find, {})
+vim.keymap.set('n', '<C-f>', builtin.live_grep, {})
 vim.keymap.set('n', '<leader>j', builtin.jumplist, {})
 -- vim.keymap.set('n', '
 
 local harpoon = require("harpoon")
 harpoon:setup()
-vim.keymap.set('n', '<leader>a', function() harpoon:list():add() end)
-vim.keymap.set('n', '<C-h>', function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
-vim.keymap.set('n', '<leader>g1', function () harpoon:list():select(1) end)
-vim.keymap.set('n', '<leader>g2', function () harpoon:list():select(2) end)
-vim.keymap.set('n', '<leader>g3', function () harpoon:list():select(3) end)
-vim.keymap.set('n', '<leader>g4', function () harpoon:list():select(4) end)
+vim.keymap.set('n', '<leader>ha', function() harpoon:list():add() end)
+vim.keymap.set('n', '<leader>hh', function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
+vim.keymap.set('n', '<leader>h1', function () harpoon:list():select(1) end)
+vim.keymap.set('n', '<leader>h2', function () harpoon:list():select(2) end)
+vim.keymap.set('n', '<leader>h3', function () harpoon:list():select(3) end)
+vim.keymap.set('n', '<leader>h4', function () harpoon:list():select(4) end)
 
 local gitsigns = require('gitsigns')
 vim.keymap.set("n", "<leader>gt", function()
@@ -474,36 +489,21 @@ vim.keymap.set("n", "<leader>gw", function()
     gitsigns.toggle_word_diff()
 end)
 
------------------------- LSP config ----------------------------
-local lspconfig = require('lspconfig')
+vim.keymap.set("n", "<leader>gb", function()
+    for _, win in ipairs(vim.api.nvim_list_wins()) do
+        local buf = vim.api.nvim_win_get_buf(win)
+        if vim.bo[buf].filetype == 'gitsigns-blame' then
+            vim.api.nvim_win_close(win, false)
+            return
+        end
+    end
+    vim.cmd('Gitsigns blame')
+end, { desc = "Toggle Gitsigns blame panel" })
 
--- require("rust-tools").setup({
---   tools = {
---     runnables = {
---       use_telescope = true,
---     },
---     -- inlay_hints = {
---     --   auto = true,
---     --   show_parameter_hints = false,
---     --   parameter_hints_prefix = "",
---     --   other_hints_prefix = "",
---     -- },
---   },
---   server = {
---     on_attach = function(_, _)
---     end,
---     settings = {
---       ["rust-analyzer"] = {
---         checkOnSave = {
---           command = "clippy",
---         },
---       },
---     },
---   },
--- })
+------------------------ LSP config ----------------------------
 
 -- rust
-lspconfig.rust_analyzer.setup({
+vim.lsp.config('rust_analyzer', {
   settings = {
     ["rust-analyzer"] = {
       check = {
@@ -518,9 +518,10 @@ lspconfig.rust_analyzer.setup({
     },
   },
 })
+vim.lsp.enable('rust_analyzer')
 
 -- python
-require("lspconfig").pyright.setup({
+vim.lsp.config('pyright', {
   settings = {
     python = {
       analysis = {
@@ -531,9 +532,10 @@ require("lspconfig").pyright.setup({
     }
   }
 })
+vim.lsp.enable('pyright')
 
 -- lua
-require('lspconfig').lua_ls.setup {
+vim.lsp.config('lua_ls', {
   on_init = function(client)
     if client.workspace_folders then
       local path = client.workspace_folders[1].name
@@ -550,7 +552,6 @@ require('lspconfig').lua_ls.setup {
       },
       workspace = {
         checkThirdParty = false,
-        -- This is the critical part:
         library = vim.api.nvim_get_runtime_file("", true)
       }
     })
@@ -558,22 +559,12 @@ require('lspconfig').lua_ls.setup {
   settings = {
     Lua = {}
   }
-}
-
--- lspconfig.pylsp.setup{
---   settings = {
---     pylsp = {
---       plugins = {
---         pycodestyle = {
---             enabled = false,
---         }
---       }
---     }
---   }
--- }
+})
+vim.lsp.enable('lua_ls')
 
 -- terraform
-lspconfig.terraformls.setup{}
+vim.lsp.config('terraformls', {})
+vim.lsp.enable('terraformls')
 vim.api.nvim_create_autocmd({"BufWritePre"}, {
   pattern = {"*.tf", "*.tfvars"},
   callback = function()
@@ -581,43 +572,45 @@ vim.api.nvim_create_autocmd({"BufWritePre"}, {
   end,
 })
 
-
 -- golang
-lspconfig.gopls.setup{
-    cmd = {"gopls", "serve"},
-    filetypes = {"go", "gomod"},
-    root_dir = lspconfig.util.root_pattern("go.work", "go.mod", ".git"),
-    settings = {
-      gopls = {
-        analyses = {
-          unusedparams = true,
-        },
-        staticcheck = true,
+vim.lsp.config('gopls', {
+  cmd = {"gopls", "serve"},
+  filetypes = {"go", "gomod"},
+  root_markers = {"go.work", "go.mod", ".git"},
+  settings = {
+    gopls = {
+      analyses = {
+        unusedparams = true,
       },
+      staticcheck = true,
     },
-}
+  },
+})
+vim.lsp.enable('gopls')
 
 -- ocaml
-lspconfig.ocamllsp.setup{}
+vim.lsp.config('ocamllsp', {})
+vim.lsp.enable('ocamllsp')
 
 -- clangd
-lspconfig.clangd.setup{
-    cmd = {"clangd"},
-    filetypes = {"c", "cu", "cuda", "cpp", "objc", "objcpp"},
-    root_dir = lspconfig.util.root_pattern("compile_commands.json", ".git"),
-    settings = {
-        clangd = {
-            arguments = {"--background-index", "--clang-tidy"},
-        },
+vim.lsp.config('clangd', {
+  cmd = {"clangd"},
+  filetypes = {"c", "cu", "cuda", "cpp", "objc", "objcpp"},
+  root_markers = {"compile_commands.json", ".git"},
+  settings = {
+    clangd = {
+      arguments = {"--background-index", "--clang-tidy"},
     },
-}
+  },
+})
+vim.lsp.enable('clangd')
 
 -- haskell
--- lspconfig.hls.setup{}
-
+-- vim.lsp.config('hls', {}); vim.lsp.enable('hls')
 
 -- typescript
-lspconfig.ts_ls.setup{}
+vim.lsp.config('ts_ls', {})
+vim.lsp.enable('ts_ls')
 
 
 vim.api.nvim_create_autocmd('LspAttach', {
@@ -735,7 +728,7 @@ vim.api.nvim_set_keymap('n', '<Leader>gg', ':lua OpenGhci()<CR>', {noremap = tru
 ---------------------- custom plugins -------------------
 -- require('debug-plug')
 -- require('mother-nvim').setup()
-require('torchfix').setup()
+-- require('torchfix').setup()
 
 -- Visual mode mappings for LLM replace commands
 vim.keymap.set('v', '<Leader>lrc', ':LLMReplaceWithContext<CR>', { noremap = true, silent = true })
