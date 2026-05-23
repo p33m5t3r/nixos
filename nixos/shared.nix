@@ -39,13 +39,13 @@
     mako
 
     # cli utils
-    git wget psmisc htop ranger pciutils lshw tmux
+    git wget psmisc htop ranger pciutils lshw tmux ffmpeg
 
     # audio
     pavucontrol pamixer alsa-utils pulseaudio
 
     # vanity
-    neofetch pipes cmatrix cowsay
+    fastfetch pipes cmatrix cowsay
 
     # Global dev tools
     direnv
@@ -54,6 +54,7 @@
     gnumake
     man-pages
     man-pages-posix
+    claude-code
 
     # Python
     graphviz
@@ -62,8 +63,8 @@
     
     # JavaScript/TypeScript
     nodejs_20 bun deno
-    nodePackages.pnpm
-    nodePackages.typescript
+    # nodePackages.pnpm
+    # nodePackages.typescript
 
     # lua
     lua-language-server
@@ -117,7 +118,7 @@
   fonts.packages = with pkgs; [
     nerd-fonts.fira-code
     noto-fonts
-    noto-fonts-emoji
+    noto-fonts-color-emoji
   ];
 
   environment.sessionVariables = {
@@ -168,9 +169,6 @@
       '';
       dev-rust = ''
         nix develop ~/nixos/flakes/rust
-      '';
-      dev-claude = ''
-        nix develop ~/nixos/flakes/claude
       '';
     };
     completion.enable = true;
