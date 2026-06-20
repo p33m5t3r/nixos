@@ -65,8 +65,34 @@ vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle,
 { desc = "Toggle undotree" })
 vim.keymap.set("n", "<leader>fb", vim.cmd.Ex,
 { desc = "Open netrw explorer" })
-vim.keymap.set("n", "<leader>nn", ":NERDTreeToggle<CR>",
-{ silent = true, desc = "Toggle NERDTree" })
+vim.keymap.set("n", "<leader>nn", function()
+  local nt_open = false
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    if vim.bo[vim.api.nvim_win_get_buf(win)].filetype == "nerdtree" then
+      nt_open = true
+      break
+    end
+  end
+  if nt_open then
+    vim.cmd("NERDTreeClose")
+    return
+  end
+  local f = vim.fn.expand("%:p")
+  if f == "" or vim.fn.filereadable(f) == 0 then
+    vim.cmd("NERDTree")
+    return
+  end
+  local dir = vim.fn.fnamemodify(f, ":h")
+  local root = vim.fn.systemlist({
+    "git", "-C", dir, "rev-parse", "--show-toplevel"
+  })[1]
+  if vim.v.shell_error == 0 and root and root ~= "" then
+    vim.cmd("NERDTree " .. vim.fn.fnameescape(root))
+    vim.cmd("NERDTreeFind " .. vim.fn.fnameescape(f))
+  else
+    vim.cmd("NERDTreeFind")
+  end
+end, { silent = true, desc = "Toggle NERDTree (reveal buffer at git root)" })
 vim.keymap.set("n", "<leader>nr", ":NERDTreeRefresh<CR>",
 { silent = true, desc = "Refresh NERDTree" })
 
