@@ -16,15 +16,12 @@
   ];
 
 # Power management - disable all suspend/sleep due to NVIDIA issues
-  services.logind = {
-    lidSwitch = "ignore";
-    powerKey = "ignore";
-    settings.Login = {
-      HandleSuspendKey="ignore";
-      HandleHibernateKey="ignore";
-      HandleLidSwitch="ignore";
-      IdleAction="ignore";
-    };
+  services.logind.settings.Login = {
+    HandlePowerKey = "ignore";
+    HandleSuspendKey = "ignore";
+    HandleHibernateKey = "ignore";
+    HandleLidSwitch = "ignore";
+    IdleAction = "ignore";
   };
 
   programs.bash = {

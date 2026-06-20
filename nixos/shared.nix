@@ -62,7 +62,7 @@
     python3Packages.ipython
     
     # JavaScript/TypeScript
-    nodejs_20 bun deno
+    nodejs bun deno
     # nodePackages.pnpm
     # nodePackages.typescript
 
