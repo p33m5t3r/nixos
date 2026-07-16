@@ -176,7 +176,7 @@ set_colorscheme(os.getenv('COLORCONFIG'))
 require('nvim-tree').setup({
   disable_netrw = false,   -- keep <leader>fb (netrw) working
   hijack_netrw = false,
-  view = { width = 35 },
+  view = { width = 35, preserve_window_proportions = true },
   renderer = { group_empty = true },
 })
 vim.keymap.set("n", "<leader>nn", ":NvimTreeFindFileToggle<CR>",
@@ -234,9 +234,9 @@ require('lualine').setup {
               readonly = '[RO!]',
           }
       }},
-      lualine_x = {'encoding', 'filetype'},
-      lualine_y = { activelsp },
-      lualine_z = {'progress'}
+      lualine_x = {},
+      lualine_y = {},
+      lualine_z = {}
   },
   inactive_sections = {
       lualine_a = {},
