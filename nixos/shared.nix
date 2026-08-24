@@ -39,7 +39,7 @@
     mako
 
     # cli utils
-    git wget psmisc htop ranger pciutils lshw tmux ffmpeg
+    git wget psmisc htop ranger pciutils lshw tmux ffmpeg unzip jq
 
     # audio
     pavucontrol pamixer alsa-utils pulseaudio
@@ -58,15 +58,16 @@
 
     # Python
     graphviz
-    python3 uv poetry pyright
+    python3 uv pyright
     python3Packages.ipython
-    
+
     # JavaScript/TypeScript
     nodejs bun deno
     # nodePackages.pnpm
     # nodePackages.typescript
 
     # lua
+    lua
     lua-language-server
     
     # Rust
@@ -116,6 +117,8 @@
   time.timeZone = "America/Denver";
 
   fonts.packages = with pkgs; [
+    nerd-fonts.iosevka
+    nerd-fonts.bigblue-terminal
     nerd-fonts.fira-code
     noto-fonts
     noto-fonts-color-emoji
@@ -146,39 +149,39 @@
     jack.enable = true;
   };
 
-  programs.bash = {
+  programs.zsh = {
+    enable = true;
+    enableCompletion = true;
+    autosuggestions.enable = true;
+    syntaxHighlighting.enable = false;
+    histSize = 10000;
+
     shellAliases = {
-      lah = "ls -lah";
-      generations-list = ''
-        sudo nix-env -p /nix/var/nix/profiles/system --list-generations
-      '';
-      generations-delete = ''
-        sudo nix-env --delete-generations +3
-      '';
-      generations-gc = ''
-        sudo nix store gc
-      '';
-      dev-hs = ''
-        nix develop ~/nixos/flakes/hs
-      '';
-      dev-ts = ''
-        nix develop ~/nixos/flakes/ts
-      '';
-      dev-py = ''
-        nix develop ~/nixos/flakes/py
-      '';
-      dev-rust = ''
-        nix develop ~/nixos/flakes/rust
-      '';
+      generations-list = "sudo nix-env -p /nix/var/nix/profiles/system --list-generations";
+      generations-delete = "sudo nix-env --delete-generations +3";
+      generations-gc = "sudo nix store gc";
+      dev-hs = "nix develop ~/nixos/flakes/hs";
+      dev-ts = "nix develop ~/nixos/flakes/ts";
+      dev-py = "nix develop ~/nixos/flakes/py";
+      dev-rust = "nix develop ~/nixos/flakes/rust";
+      workon = "source .venv/bin/activate";
+      screenshot = "grim -g \"$(slurp)\"";
+      screensaver = "pipes.sh -t 1 -r 20000 -p 5 -f 25 -c 5";
+      open = "google-chrome-stable";
+      claude = "claude --dangerously-skip-permissions";
     };
-    completion.enable = true;
+
+    # zsh port of the snowflake λ prompt
     promptInit = ''
-      __prompt_nix_shell() {
-        if [ -n "$IN_NIX_SHELL" ]; then
-          echo "❄️ "  # Snowflake for Nix
-        fi
-      }
-      PS1='\[\033[36m\]$(__prompt_nix_shell)\[\033[35m\]\w\[\033[0m\] λ '
+      autoload -U colors && colors
+      setopt prompt_subst
+      __prompt_nix_shell() { [ -n "$IN_NIX_SHELL" ] && echo "❄️ "; }
+      PROMPT='%F{cyan}$(__prompt_nix_shell)%F{magenta}%~%f λ '
+    '';
+
+    interactiveShellInit = ''
+      export PATH="$HOME/.scripts:$PATH"
+      eval "$(direnv hook zsh)"
     '';
   };
 
@@ -196,6 +199,7 @@
   users.users.anon = {
     isNormalUser = true;
     extraGroups = ["wheel" "networkmanager" "audio"];
+    shell = pkgs.zsh;
   };
 
   security.sudo.extraConfig = ''

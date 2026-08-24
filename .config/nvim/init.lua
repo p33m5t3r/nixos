@@ -30,7 +30,7 @@ vim.g.mapleader = " "
 
 ---------------------- colorscheme ----------------------
 -- carbonfox / dayfox both come from nightfox.nvim
-local theme = 'carbonfox'
+local theme = 'nightfox'
 local set_colorscheme = function(mode)
   if mode == 'light' then theme = 'dayfox' end
   local ok, _ = pcall(vim.cmd, string.format("colorscheme %s", theme))

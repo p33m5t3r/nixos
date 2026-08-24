@@ -3,19 +3,11 @@
   # boot.loader.efi.efiSysMountPoint = "/boot/efi";
   networking.hostName = "nixbox";
  
-  # normal config
-  # imports = [ 
-  #   ./modules/nvda/desktop.nix 
-  #   ./modules/games/default.nix
-  # ];
-
-  # gaming config
   imports = [ 
     ./modules/nvda/beta.nix 
     ./modules/games/default.nix
   ];
 
-# Power management - disable all suspend/sleep due to NVIDIA issues
   services.logind.settings.Login = {
     HandlePowerKey = "ignore";
     HandleSuspendKey = "ignore";
@@ -24,11 +16,11 @@
     IdleAction = "ignore";
   };
 
-  programs.bash = {
-    shellAliases = {
-      rebuild = ''
-      sudo nixos-rebuild switch --flake ~/nixos/nixos#desktop
-      '';
-    };
+  programs.zsh.shellAliases.rebuild = "sudo nixos-rebuild switch --flake ~/nixos/nixos#desktop";
+
+  environment.sessionVariables = {
+    LIBVA_DRIVER_NAME = "nvidia";
+    GBM_BACKEND = "nvidia-drm";
+    __GLX_VENDOR_LIBRARY_NAME = "nvidia";
   };
 }
