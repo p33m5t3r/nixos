@@ -77,8 +77,7 @@
     clang-tools
     
     # LaTeX
-    tree-sitter
-    texlive.combined.scheme-full
+    # texlive.combined.scheme-full
     zathura
     
     # Hyprland (parallel install with Sway for migration)
@@ -98,6 +97,7 @@
     # neovim
     neovim
     ripgrep
+    tree-sitter
 
   ];
 
