@@ -16,7 +16,7 @@ vim.opt.termguicolors = true
 vim.opt.scrolloff = 8
 vim.opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
 vim.opt.undofile = true
-vim.opt.cmdheight = 1
+vim.opt.cmdheight = 0   -- no permanent cmdline row; ":" draws over the statusline
 vim.opt.showmode = false
 vim.cmd([[
   autocmd FileType lua setlocal shiftwidth=2 softtabstop=2
@@ -217,13 +217,69 @@ local function activelsp()
   return table.concat(names, ',')
 end
 
+-- lualine builds the 'statusline' string itself and defines its own highlight
+-- groups per section, per mode. That's why the colorscheme doesn't reach it and
+-- it needs a theme of its own: a table of {fg,bg,gui} for sections a/b/c in
+-- each mode. (nightfox.nvim ships one - `theme = 'nightfox'` - but it's the
+-- blocky kind. This one is flat: shared background, colour only on the mode.)
+local nf = {
+  bg      = '#192330',
+  fg      = '#cdcecf',
+  dim     = '#71839b',
+  faint   = '#575860',
+  blue    = '#719cd6',
+  green   = '#81b29a',
+  magenta = '#9d79d6',
+  red     = '#c94f6d',
+  orange  = '#f4a261',
+  cyan    = '#63cdcf',
+  pink    = '#b48ead',
+}
+
+-- every section shares the editor background, so nothing reads as a block;
+-- the mode word is the only thing that changes colour.
+local function flat(accent)
+  return {
+    a = { fg = accent,   bg = nf.bg, gui = 'bold' },
+    b = { fg = nf.dim,   bg = nf.bg },
+    c = { fg = nf.faint, bg = nf.bg },
+  }
+end
+
+local nightfox_flat = {
+  normal   = flat(nf.pink),
+  insert   = flat(nf.green),
+  visual   = flat(nf.magenta),
+  replace  = flat(nf.red),
+  command  = flat(nf.orange),
+  terminal = flat(nf.cyan),
+  inactive = {
+    a = { fg = nf.faint, bg = nf.bg },
+    b = { fg = nf.faint, bg = nf.bg },
+    c = { fg = nf.faint, bg = nf.bg },
+  },
+}
+
+-- cmdheight=0 leaves nowhere for "recording @q" to appear, so show it here
+local function macro_recording()
+  local reg = vim.fn.reg_recording()
+  if reg == '' then return '' end
+  return 'rec @' .. reg
+end
+
 require('lualine').setup {
   options = {
-    theme = theme
+    theme = nightfox_flat,
+    section_separators = '',
+    component_separators = '',
   },
   sections = {
-      lualine_a = {'mode'},
-      lualine_b = {'branch', 'diff', 'diagnostics'},
+      lualine_a = {{ 'mode', fmt = string.lower }},
+      lualine_b = {
+        { 'branch', icon = '' },
+        { 'diff', symbols = { added = '+', modified = '~', removed = '-' } },
+        { 'diagnostics', symbols = { error = 'E', warn = 'W', info = 'I', hint = 'H' } },
+      },
       lualine_c =
       {{
           'filename',
@@ -234,7 +290,7 @@ require('lualine').setup {
               readonly = '[RO!]',
           }
       }},
-      lualine_x = {},
+      lualine_x = {{ macro_recording, color = { fg = nf.red, gui = 'bold' } }},
       lualine_y = {},
       lualine_z = {}
   },
@@ -255,6 +311,14 @@ require('lualine').setup {
       lualine_z = {}
   },
 }
+
+-- RecordingLeave fires before reg_recording() clears, hence the schedule()
+vim.api.nvim_create_autocmd('RecordingEnter', {
+  callback = function() require('lualine').refresh() end,
+})
+vim.api.nvim_create_autocmd('RecordingLeave', {
+  callback = function() vim.schedule(function() require('lualine').refresh() end) end,
+})
 
 ---------------------- treesitter ----------------------
 -- main branch: install parsers here, highlight natively via vim.treesitter.start

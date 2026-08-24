@@ -23,8 +23,8 @@ end)
 
 hl.config({
     general = {
-        gaps_in  = 0,
-        gaps_out = 12,
+        gaps_in  = 3,
+        gaps_out = { top = 2, right = 12, bottom = 12, left = 12 },
         border_size = 1,
 
         col = {
@@ -38,7 +38,7 @@ hl.config({
     },
 
     decoration = {
-        rounding       = 0,
+        rounding       = 5,
         rounding_power = 2,
 
         active_opacity   = 1.0,
@@ -60,6 +60,30 @@ hl.config({
     },
 
     animations = {
-        enabled = false,
+        enabled = true,
     },
+})
+
+-- Quick, snappy window motion. speed is in deciseconds (lower = faster).
+hl.curve("snap", { type = "bezier", points = { { 0.2, 1 }, { 0.25, 1 } } })
+
+hl.animation({ leaf = "global",     enabled = true, speed = 1.8, bezier = "snap" })
+hl.animation({ leaf = "windows",    enabled = true, speed = 1.8, bezier = "snap" })
+hl.animation({ leaf = "windowsIn",  enabled = true, speed = 1.4, bezier = "snap", style = "popin 92%" })
+hl.animation({ leaf = "windowsOut", enabled = true, speed = 1.1, bezier = "snap", style = "popin 92%" })
+hl.animation({ leaf = "border",     enabled = true, speed = 1.4, bezier = "snap" })
+hl.animation({ leaf = "fade",       enabled = true, speed = 1.1, bezier = "snap" })
+hl.animation({ leaf = "workspaces", enabled = true, speed = 1.8, bezier = "snap", style = "slide" })
+
+-- Frosted glass behind the bar: waybar draws no background of its own.
+hl.layer_rule({
+    name  = "waybar-blur",
+    match = { namespace = "^waybar$" },
+    blur  = true,
+})
+
+hl.layer_rule({
+    name  = "wofi-blur",
+    match = { namespace = "^wofi$" },
+    blur  = true,
 })

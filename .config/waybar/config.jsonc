@@ -4,7 +4,7 @@
     // This is the only hardcoded output — it's always present.
     "output": "DP-1",
     "layer": "top",
-    "position": "bottom",
+    "position": "top",
     "spacing": 0,
     "height": 0,
 
@@ -48,7 +48,7 @@
     },
 
     "cpu": {
-        "format": "cpu {usage}%",
+        "format": "<span size='x-large' rise='-1300'></span> {usage}%",
         "interval": 2,
 
         "states": {
@@ -57,7 +57,7 @@
     },
 
     "memory": {
-        "format": "mem {used:0.1f}G/{total:0.0f}G",
+        "format": "<span size='x-large' rise='-1300'></span> {used:0.1f}G/{total:0.0f}G",
         "interval": 2,
 
         "states": {
@@ -65,7 +65,9 @@
         }
     },
     "battery": {
-        "format": "bat {capacity}%",
+        "format": "<span size='x-large' rise='-1300'>{icon}</span> {capacity}%",
+        "format-charging": "<span size='x-large' rise='-1300'></span> {capacity}%",
+        "format-icons": ["", "", "", "", ""],
         "interval": 5,
         "states": {
             "warning": 20,
@@ -75,9 +77,9 @@
     },
 
     "network": {
-        "format-wifi" : "wifi \"{essid}\" {ipaddr} ",
-        "format-ethernet": "enth {bandwidthDownBits}",
-        "format-disconnected" : "no network",
+        "format-wifi" : "<span size='x-large' rise='-1300'></span> {essid} {ipaddr}",
+        "format-ethernet": "<span size='x-large' rise='-1300'></span> {bandwidthDownBits}",
+        "format-disconnected" : "<span size='x-large' rise='-1300'></span> offline",
         "interval": 5,
         "tooltip": false
     },
@@ -85,9 +87,10 @@
     "pulseaudio": {
         "scroll-step": 5,
         "max-volume": 150,
-        "format": "vol {volume}%",
-        "format-muted": "MUTED {volume}%",
-        "format-bluetooth": "vol {volume}%",
+        "format": "<span size='x-large' rise='-1300'>{icon}</span> {volume}%",
+        "format-muted": "<span size='x-large' rise='-1300'></span> muted",
+        "format-bluetooth": "<span size='x-large' rise='-1300'></span> {volume}%",
+        "format-icons": {"default": ["", ""]},
         "nospacing": 1,
         "on-click": "pavucontrol",
         "tooltip": false
@@ -99,7 +102,7 @@
     // so disabling the tv or the side monitor never breaks the bars.
     "output": "!DP-1",
     "layer": "top",
-    "position": "bottom",
+    "position": "top",
     "spacing": 0,
     "height": 0,
 

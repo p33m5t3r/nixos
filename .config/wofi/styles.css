@@ -1,60 +1,108 @@
-/* === Window Styling === */
+/* Nightfox - matches waybar / hyprland / tmux
+ *
+ * Renaming / hiding launcher entries
+ * ---------------------------------
+ * wofi lists .desktop files from $XDG_DATA_HOME/applications (~/.local/share/
+ * applications) and $XDG_DATA_DIRS/applications. XDG_DATA_HOME wins, and the
+ * match is by FILENAME - so dropping a file with the same basename into
+ * ~/.local/share/applications overrides the system one entirely (no duplicate).
+ *
+ *   rename:  cp /run/current-system/sw/share/applications/foo.desktop \
+ *              ~/.local/share/applications/ && edit the first Name= line
+ *              (only the one under [Desktop Entry]; [Desktop Action] blocks
+ *              have their own Name= lines)
+ *
+ *   hide:    same copy, then append  NoDisplay=true
+ *            NoDisplay only hides it from launchers - the entry still works
+ *            as a MIME/URL handler (zathura still opens PDFs, etc).
+ *            Hidden=true would instead mean "treat as deleted" and break that.
+ *
+ * Gotcha: copies are static snapshots. If the Exec= line points into /nix/store
+ * (google-chrome did), rewrite it to the bare command on PATH or the entry
+ * breaks the next time that package updates and the old path is GC'd.
+ *
+ * Revert any override with:  rm ~/.local/share/applications/<name>.desktop
+ */
+
 window {
-    background-color: #2e3440; /* Nordfox background */
-    border: 4px double #b48ead; /* Nordfox magenta */
+    background-color: rgba(25, 35, 48, 0.85);
+    border: 1px solid rgba(154, 151, 191, 0.45);
+    border-radius: 8px;
+    font-family: "Iosevka Nerd Font Mono", monospace;
+    font-size: 18px;
+    color: #cdcecf;
+}
+
+#outer-box {
+    background-color: transparent;
+    border: none;
     padding: 10px;
 }
 
-/* === Outer Box === */
-#outer-box {
-    background-color: #2e3440; /* Same as window */
-    border: none;
-}
-
-/* === Input Box === */
+/* Search field - a recessed well, not a boxed-in widget */
 #input {
-    background-color: #3b4252; /* Nordfox black */
-    color: #cdcecf; /* Nordfox foreground */
-    border: 3px double #81a1c1; /* Nordfox blue */
-    padding: 5px;
-    font-family: "Fixedsys", monospace;
-    font-size: 16px;
-    text-transform: uppercase;
+    background-color: rgba(43, 59, 81, 0.6);
+    color: #cdcecf;
+    border: 1px solid rgba(154, 151, 191, 0.25);
+    border-radius: 6px;
+    padding: 7px 10px;
+    margin-bottom: 8px;
 }
 
-/* === Scroll Box === */
+/* GTK paints a blue focus ring on the entry - keep it as-is while typing */
+#input:focus,
+#input:hover,
+#input selection {
+    border-color: rgba(154, 151, 191, 0.25);
+    box-shadow: none;
+    outline: none;
+}
+
+#input image {
+    color: #575860;
+}
+
 #scroll {
-    background-color: #2e3440; /* Nordfox background */
+    background-color: transparent;
     border: none;
 }
 
-/* === Entry Styling (Unselected) === */
+#inner-box {
+    background-color: transparent;
+    border: none;
+}
+
+/* Entries recede until selected */
 #entry {
-    background-color: #3b4252; /* Nordfox black */
-    color: #cdcecf; /* Nordfox foreground */
-    border: 3px double #465780; /* Nordfox dark blue */
-    margin: 4px 0;
-    padding: 5px;
-    font-family: "Fixedsys", monospace;
-    font-size: 16px;
-    text-transform: uppercase;
+    background-color: transparent;
+    color: #a8b4c6;
+    border: none;
+    border-radius: 5px;
+    padding: 7px 12px;
+    margin: 1px 0;
 }
 
-/* === Entry Styling (Selected) === */
+#entry:hover {
+    background-color: #212e3f;
+    color: #cdcecf;
+}
+
+/* Selected carries the same gradient as the active workspace pill */
 #entry:selected {
-    background-color: #b48ead; /* Nordfox magenta */
-    color: #2e3440; /* Nordfox background for contrast */
-    border: 3px double #81a1c1; /* Nordfox blue border */
+    background-image: linear-gradient(to top right, #b48ead, #81a1c1);
+    color: #131a24;
+    font-weight: 700;
+    border: none;
 }
 
-/* === Entry Text === */
 #text {
-    font-family: "Fixedsys", monospace;
-    font-size: 16px;
+    background-color: transparent;
 }
 
-/* === Selected Text === */
 #text:selected {
-    color: #2e3440; /* Nordfox background when selected */
+    color: #131a24;
 }
 
+#img {
+    margin-right: 8px;
+}
