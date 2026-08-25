@@ -29,13 +29,24 @@ vim.cmd([[
 vim.g.mapleader = " "
 
 ---------------------- colorscheme ----------------------
--- carbonfox / dayfox both come from nightfox.nvim
-local theme = 'nightfox'
+-- $THEME names the desktop-wide look and is exported by hyprland
+-- (~/.config/hypr/theme-<name>.lua), so nvim matches the bar and the terminal
+-- it was opened from. Unset falls back to the default look.
+--   default - nightfox / dayfox, both from nightfox.nvim
+--   nina    - light paper theme, hand-written, see colors/nina.lua
+-- $COLORCONFIG=light picks a theme's light variant where it has one.
+local Theme = os.getenv('THEME') or 'default'
+
+local colorschemes = {
+  default = { dark = 'nightfox', light = 'dayfox' },
+  nina    = { dark = 'nina',     light = 'nina'   },
+}
+
 local set_colorscheme = function(mode)
-  if mode == 'light' then theme = 'dayfox' end
-  local ok, _ = pcall(vim.cmd, string.format("colorscheme %s", theme))
-  if not ok then
-    vim.cmd("colorscheme default")
+  local pick = colorschemes[Theme] or colorschemes.default
+  local name = (mode == 'light') and pick.light or pick.dark
+  if not pcall(vim.cmd, 'colorscheme ' .. name) then
+    vim.cmd('colorscheme default')
   end
 end
 -- (applied after lazy loads the colorscheme plugin, see below)
@@ -222,19 +233,40 @@ end
 -- it needs a theme of its own: a table of {fg,bg,gui} for sections a/b/c in
 -- each mode. (nightfox.nvim ships one - `theme = 'nightfox'` - but it's the
 -- blocky kind. This one is flat: shared background, colour only on the mode.)
-local nf = {
-  bg      = '#192330',
-  fg      = '#cdcecf',
-  dim     = '#71839b',
-  faint   = '#575860',
-  blue    = '#719cd6',
-  green   = '#81b29a',
-  magenta = '#9d79d6',
-  red     = '#c94f6d',
-  orange  = '#f4a261',
-  cyan    = '#63cdcf',
-  pink    = '#b48ead',
+--
+-- One palette per $THEME, same slot names, so the flat() builder below is
+-- written once. 'pink' is whatever colour normal mode should be.
+local palettes = {
+  default = {
+    bg      = '#192330',
+    fg      = '#cdcecf',
+    dim     = '#71839b',
+    faint   = '#575860',
+    blue    = '#719cd6',
+    green   = '#81b29a',
+    magenta = '#9d79d6',
+    red     = '#c94f6d',
+    orange  = '#f4a261',
+    cyan    = '#63cdcf',
+    pink    = '#b48ead',
+  },
+  -- nina rations colour: the accent blue is normal mode, everything else is
+  -- the darkest legible version of its hue on paper
+  nina = {
+    bg      = '#f6f2ee',
+    fg      = '#14140f',
+    dim     = '#908f8a',
+    faint   = '#b7b6b0',
+    blue    = '#2b2bd8',
+    green   = '#2f6d43',
+    magenta = '#6b3fd8',
+    red     = '#9d2233',
+    orange  = '#8a6212',
+    cyan    = '#1c6f68',
+    pink    = '#2b2bd8',
+  },
 }
+local nf = palettes[Theme] or palettes.default
 
 -- every section shares the editor background, so nothing reads as a block;
 -- the mode word is the only thing that changes colour.
@@ -246,7 +278,7 @@ local function flat(accent)
   }
 end
 
-local nightfox_flat = {
+local flat_theme = {
   normal   = flat(nf.pink),
   insert   = flat(nf.green),
   visual   = flat(nf.magenta),
@@ -269,7 +301,7 @@ end
 
 require('lualine').setup {
   options = {
-    theme = nightfox_flat,
+    theme = flat_theme,
     section_separators = '',
     component_separators = '',
   },

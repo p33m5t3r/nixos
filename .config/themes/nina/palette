@@ -1,0 +1,43 @@
+# nina — the single source of truth for the palette.
+#
+# Not read by any program. Every file in this directory hardcodes these values
+# (kitty, GTK css, tmux and lua have no shared config format between them), so
+# when you change a colour here, grep the hex in this directory and change it
+# everywhere it appears.
+#
+# The look: paper, near-black ink, one electric blue that does all the emphasis,
+# one muted teal as the second voice. Nothing is rounded — every radius in this
+# theme is 0.
+
+paper       #f6f2ee   page background (dayfox's bg1 — paper without the yellow)
+panel       #fcfcfa   raised surfaces (bar, launcher, popups)
+ink         #14140f   body text
+accent      #2b2bd8   electric blue — selection, active, focus
+accent2     #1c6f68   teal — strings, secondary values
+sel         #d9d9f3   selection background (accent at ~9% over paper)
+wash        #e9e9f7   hover / current-line (accent at ~5% over paper)
+
+# ink over paper at decreasing opacity, precomputed as solids
+rule        #7a7a73   borders (ink 55%)
+muted       #908f8a   de-emphasised text (ink 45%)
+faint       #b7b6b0   line numbers, disabled (ink 28%)
+
+# ansi — a light-background set. color7/color15 are dark on purpose:
+# on paper, a literal white "white" is invisible.
+red         #9d2233
+green       #2f6d43
+yellow      #8a6212
+blue        #2b2bd8
+magenta     #6b3fd8
+cyan        #1c6f68
+
+bright_red      #c03a4a
+bright_green    #3f8a58
+bright_yellow   #a8801e
+bright_blue     #4a4ae2
+bright_magenta  #8558e4
+bright_cyan     #2f8c84
+
+# type
+ui          Libertinus Serif    bar, launcher, window chrome
+mono        Libertinus Mono     terminal, editor

@@ -1,0 +1,151 @@
+// nina — waybar
+//
+// Passed to waybar with -c from ~/.config/hypr/theme-nina.lua.
+//
+// Same two-bar structure as the default config: one full bar hardcoded to the
+// main output, one minimal bar on "!DP-1" (every other connected output,
+// resolved at runtime) so unplugging a monitor never breaks a bar.
+//
+// The nerd-font glyphs of the default theme are gone — Libertinus has none, and
+// the design wants words anyway. Each stat reads as a small mono label followed
+// by a serif value. CSS can't reach inside a module's label, so the label's font
+// and colour are set here as pango markup instead.
+[
+{
+    "output": "DP-1",
+    "layer": "top",
+    "position": "top",
+    "spacing": 0,
+    "height": 0,
+
+    "margin-top": 8,
+    "margin-right": 12,
+    "margin-bottom": 0,
+    "margin-left": 12,
+
+    "modules-left": [
+        "hyprland/workspaces"
+    ],
+
+    "modules-center": [],
+
+    "modules-right": [
+        "tray",
+        "cpu",
+        "memory",
+        "battery",
+        "network",
+        "pulseaudio",
+        "clock"
+    ],
+
+    // roman numerals: I–III for the workspaces in daily use, minuscule
+    // thereafter, matching the mock's bar
+    "hyprland/workspaces": {
+        "disable-scroll": true,
+        "all-outputs": false,
+        "tooltip": false,
+        "format": "{icon}",
+        "format-icons": {
+            "1": "I", "2": "II", "3": "III", "4": "iv", "5": "v",
+            "6": "vi", "7": "vii", "8": "viii", "9": "ix", "10": "x",
+            "default": "{id}"
+        },
+        "on-click": "activate"
+    },
+
+    "tray": {
+        "spacing": 10,
+        "tooltip": false
+    },
+
+    "clock": {
+        "format": "<span font_desc='Libertinus Serif Italic 11'>{0:%a %d %b}</span>  <span font_desc='Libertinus Mono 10'>{0:%H:%M}</span>",
+        "tooltip": false
+    },
+
+    "cpu": {
+        "format": "<span font_desc='Libertinus Mono 8' fgcolor='#908f8a'>CPU</span> {usage}%",
+        "interval": 2,
+        "states": {
+            "critical": 90
+        }
+    },
+
+    "memory": {
+        "format": "<span font_desc='Libertinus Mono 8' fgcolor='#908f8a'>MEM</span> {used:0.1f}G",
+        "interval": 2,
+        "states": {
+            "critical": 80
+        }
+    },
+
+    "battery": {
+        "format": "<span font_desc='Libertinus Mono 8' fgcolor='#908f8a'>BAT</span> {capacity}",
+        "format-charging": "<span font_desc='Libertinus Mono 8' fgcolor='#2b2bd8'>CHG</span> {capacity}",
+        "interval": 5,
+        "states": {
+            "warning": 20,
+            "critical": 10
+        },
+        "tooltip": false
+    },
+
+    "network": {
+        "format-wifi": "<span font_desc='Libertinus Mono 8' fgcolor='#908f8a'>NET</span> {essid}",
+        "format-ethernet": "<span font_desc='Libertinus Mono 8' fgcolor='#908f8a'>NET</span> {bandwidthDownBits}",
+        "format-disconnected": "<span font_desc='Libertinus Mono 8' fgcolor='#908f8a'>NET</span> offline",
+        "interval": 5,
+        "tooltip": false
+    },
+
+    "pulseaudio": {
+        "scroll-step": 5,
+        "max-volume": 150,
+        "format": "<span font_desc='Libertinus Mono 8' fgcolor='#908f8a'>VOL</span> {volume}",
+        "format-muted": "<span font_desc='Libertinus Mono 8' fgcolor='#908f8a'>VOL</span> muted",
+        "format-bluetooth": "<span font_desc='Libertinus Mono 8' fgcolor='#908f8a'>BT</span> {volume}",
+        "nospacing": 1,
+        "on-click": "pavucontrol",
+        "tooltip": false
+    }
+},
+{
+    "output": "!DP-1",
+    "layer": "top",
+    "position": "top",
+    "spacing": 0,
+    "height": 0,
+
+    "margin-top": 8,
+    "margin-right": 12,
+    "margin-bottom": 0,
+    "margin-left": 12,
+
+    "modules-left": [
+        "hyprland/workspaces"
+    ],
+
+    "modules-center": [],
+
+    "modules-right": ["clock"],
+
+    "clock": {
+        "format": "<span font_desc='Libertinus Mono 10'>{0:%H:%M}</span>",
+        "tooltip": false
+    },
+
+    "hyprland/workspaces": {
+        "disable-scroll": true,
+        "all-outputs": false,
+        "tooltip": false,
+        "format": "{icon}",
+        "format-icons": {
+            "1": "I", "2": "II", "3": "III", "4": "iv", "5": "v",
+            "6": "vi", "7": "vii", "8": "viii", "9": "ix", "10": "x",
+            "default": "{id}"
+        },
+        "on-click": "activate"
+    }
+}
+]

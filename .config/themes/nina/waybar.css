@@ -1,0 +1,107 @@
+/* nina — waybar
+ *
+ * Passed to waybar with -s from ~/.config/hypr/theme-nina.lua.
+ *
+ * The bar is a piece of paper laid on the desktop: one hairline ink border, a
+ * hard bottom edge instead of a shadow, and no radius anywhere. Colour is
+ * rationed — the clock block is the only saturated thing on it.
+ */
+
+* {
+    border: none;
+    border-radius: 0;
+    min-height: 0;
+    font-family: "Libertinus Serif", serif;
+    font-size: 16px;
+    padding: 0;
+    margin: 0;
+}
+
+window#waybar {
+    background: transparent;
+}
+
+/* the paper itself. 2px bottom border reads as the mock's hard drop edge */
+window#waybar > box {
+    background: rgba(252, 252, 250, 0.94);
+    border: 1px solid #7a7a73;
+    border-bottom-width: 2px;
+    padding: 0;
+}
+
+tooltip {
+    background-color: #fcfcfa;
+    border: 1px solid #7a7a73;
+    color: #14140f;
+}
+
+/* stats: mono label + serif value, separated by nothing but space */
+#tray,
+#cpu,
+#memory,
+#battery,
+#network,
+#pulseaudio {
+    padding: 2px 12px;
+    color: #14140f;
+}
+
+/* the one saturated element — a full-height blue block flush to the right */
+#clock {
+    padding: 3px 14px;
+    background-color: #2b2bd8;
+    color: #fbfbfd;
+}
+
+#workspaces {
+    background-color: transparent;
+    padding: 0 8px;
+    border-right: 1px solid #b7b6b0;
+}
+
+/* numerals, not pills: inactive workspaces are simply lighter ink */
+#workspaces button {
+    font-family: inherit;
+    font-size: inherit;
+    min-width: 22px;
+    min-height: 0;
+    padding: 2px 6px;
+    margin: 0;
+    background-color: transparent;
+    color: #b7b6b0;
+    transition: color 120ms ease, background-color 120ms ease;
+}
+
+#workspaces button:hover {
+    background-color: transparent;
+    color: #14140f;
+    box-shadow: none;
+    text-shadow: none;
+}
+
+/* active is underlined in accent rather than filled — keeps the strip quiet */
+#workspaces button.active {
+    background-color: transparent;
+    color: #2b2bd8;
+    box-shadow: inset 0 -2px 0 #2b2bd8;
+}
+
+#workspaces button.urgent {
+    background-color: #9d2233;
+    color: #f6f2ee;
+}
+
+/* alarm states invert instead of tinting — nothing else on the bar is filled,
+ * so a filled stat is unmissable */
+#cpu.critical,
+#memory.critical,
+#battery.warning,
+#battery.critical,
+#battery.urgent {
+    background-color: #9d2233;
+    color: #f6f2ee;
+}
+
+#pulseaudio.muted {
+    color: #908f8a;
+}

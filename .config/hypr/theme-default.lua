@@ -6,13 +6,18 @@ Bar = "waybar"
 hl.env("XCURSOR_THEME", "Vanilla-DMZ")
 hl.env("XCURSOR_SIZE", "24")
 
+-- Only starts swaybg if it isn't already up. The match is deliberately not
+-- `pgrep -x swaybg`: on nixos swaybg is a wrapped binary whose comm is
+-- ".swaybg-wrapped", so an exact match never hits — and neither did the
+-- `killall swaybg` this used to run, which is why every reload left another
+-- copy behind. A loose comm match catches the wrapper, and unlike
+-- `pgrep -f swaybg` it won't match this guard's own shell.
 local function set_wallpaper()
     local w1 = "~/wallpaper/polyre-left.png"
     local w2 = "~/wallpaper/polyre-right.png"
     hl.exec_cmd(([[
-      killall -q swaybg 2>/dev/null;\
-      swaybg -o DP-1 -i %s -o HDMI-A-1 -i %s -m fill
-    ]]):format(w1,w2))
+      pgrep swaybg >/dev/null || swaybg -o DP-1 -i %s -o HDMI-A-1 -i %s -m fill
+    ]]):format(w1, w2))
 end
 
 hl.on("config.reloaded", set_wallpaper)

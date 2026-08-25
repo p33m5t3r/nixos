@@ -122,6 +122,7 @@
     nerd-fonts.fira-code
     noto-fonts
     noto-fonts-color-emoji
+    libertinus
   ];
 
   environment.sessionVariables = {

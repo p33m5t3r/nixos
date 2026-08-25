@@ -1,0 +1,91 @@
+/* nina — wofi
+ *
+ * Passed to wofi with -s from ~/.config/hypr/theme-nina.lua.
+ *
+ * See ~/.config/wofi/styles.css for the notes on renaming and hiding launcher
+ * entries — that's a property of the .desktop files, not of the theme.
+ *
+ * A sheet of paper with a blue rule around it. The search field is a boxed
+ * input rather than the default's recessed well, and the selected row is the
+ * only filled thing in the window.
+ */
+
+window {
+    background-color: rgba(252, 252, 250, 0.96);
+    border: 2px solid #2b2bd8;
+    border-radius: 0;
+    font-family: "Libertinus Serif", serif;
+    font-size: 20px;
+    color: #14140f;
+}
+
+#outer-box {
+    background-color: transparent;
+    border: none;
+    padding: 14px;
+}
+
+#input {
+    background-color: #ffffff;
+    color: #14140f;
+    caret-color: #2b2bd8;
+    border: 1px solid #7a7a73;
+    border-radius: 0;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+}
+
+/* GTK paints a focus ring on the entry; hold the border still while typing */
+#input:focus,
+#input:hover,
+#input selection {
+    border-color: #7a7a73;
+    box-shadow: none;
+    outline: none;
+}
+
+#input image {
+    color: #2b2bd8;
+}
+
+#scroll {
+    background-color: transparent;
+    border: none;
+}
+
+#inner-box {
+    background-color: transparent;
+    border: none;
+}
+
+#entry {
+    background-color: transparent;
+    color: #14140f;
+    border: none;
+    border-radius: 0;
+    padding: 7px 10px;
+    margin: 0;
+}
+
+#entry:hover {
+    background-color: #e9e9f7;
+    color: #14140f;
+}
+
+#entry:selected {
+    background-color: #2b2bd8;
+    color: #fbfbfd;
+    border: none;
+}
+
+#text {
+    background-color: transparent;
+}
+
+#text:selected {
+    color: #fbfbfd;
+}
+
+#img {
+    margin-right: 10px;
+}
