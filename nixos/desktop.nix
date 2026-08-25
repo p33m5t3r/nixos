@@ -6,6 +6,7 @@
   imports = [ 
     ./modules/nvda/beta.nix 
     ./modules/games/default.nix
+    ./modules/gamecube-adapter
   ];
 
   services.logind.settings.Login = {

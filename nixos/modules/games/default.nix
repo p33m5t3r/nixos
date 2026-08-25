@@ -19,6 +19,7 @@
   };
   hardware.graphics.enable = true;
   hardware.graphics.enable32Bit = true;
+  hardware.gamecube-adapter.enable = true;
   programs.xwayland.enable = true;
 
   environment.systemPackages = with pkgs; [

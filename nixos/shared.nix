@@ -165,6 +165,7 @@
       dev-ts = "nix develop ~/nixos/flakes/ts";
       dev-py = "nix develop ~/nixos/flakes/py";
       dev-rust = "nix develop ~/nixos/flakes/rust";
+      slippi = "nix run ~/nixos/flakes/slippi";
       workon = "source .venv/bin/activate";
       screenshot = "grim -g \"$(slurp)\"";
       screensaver = "pipes.sh -t 1 -r 20000 -p 5 -f 25 -c 5";
