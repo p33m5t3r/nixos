@@ -41,11 +41,23 @@ hl.window_rule({
 
 local mainMod = "SUPER"
 
+local hs = require("hyprsplit")
+hs.config({ num_workspaces = 10 })
+
+-- name workspaces by their per-monitor index (11 -> "1", 12 -> "2", ...)
+for i = 1, 30 do
+    hl.workspace_rule({
+        workspace    = tostring(i),
+        default_name = tostring((i - 1) % 10 + 1),
+    })
+end
+
 for i = 1, 10 do
     local key = i % 10
-    hl.bind(mainMod .. " + " .. key,           hl.dsp.focus({ workspace = i }))
-    hl.bind(mainMod .. " + SHIFT + " .. key,   hl.dsp.window.move({ workspace = i }))
+    hl.bind(mainMod .. " + " .. key,           hs.dsp.focus({ workspace = i }))
+    hl.bind(mainMod .. " + SHIFT + " .. key,   hs.dsp.window.move({ workspace = i }))
 end
+hl.bind(mainMod .. " + g", hs.dsp.grab_rogue_windows())
 
 hl.bind(mainMod .. " + Return",        hl.dsp.exec_cmd(Terminal))
 hl.bind(mainMod .. " + SHIFT + q",     hl.dsp.window.close())

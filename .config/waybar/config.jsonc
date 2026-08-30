@@ -35,7 +35,7 @@
         "disable-scroll": true,
         "all-outputs": false,
         "tooltip": false,
-        "format": "{id}",
+        "format": "{name}",
         "on-click": "activate"
     },
 
@@ -145,7 +145,7 @@
         "disable-scroll": true,
         "all-outputs": false,
         "tooltip": false,
-        "format": "{id}",
+        "format": "{name}",
         "on-click": "activate"
     }
 }
