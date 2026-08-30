@@ -5,4 +5,6 @@ hardware-configuration.nix
 nixos/modules/scripts/*
 !nixos/modules/scripts/default.nix
 
-
+.config/firefox/
+.config/reference/
+CLAUDE.md

@@ -16,15 +16,40 @@
   };
 
   environment.systemPackages = with pkgs; [
-    # graphical user programs
-    firefox 
+    # cli/dev utils
+    man-pages man-pages-posix
+    git wget psmisc htop pciutils lm_sensors lshw tmux ffmpeg unzip jq 
+    kitty neovim ripgrep tree-sitter ranger
+    
+    # audio
+    pavucontrol pamixer alsa-utils pulseaudio
+
+    # silliness
+    fastfetch pipes cmatrix cowsay lavat dysk
+
+    # dev
+    direnv 
+    claude-code
+    gcc cmake gnumake clang-tools
+    python3 uv pyright python3Packages.ipython graphviz 
+    nodejs bun deno
+    lua lua-language-server
+    rustc cargo rust-analyzer
+    
+    # wm
+    hyprland
+    grim slurp wl-clipboard      
+    zathura yazi vanilla-dmz waybar wofi
+    swaybg brightnessctl hypridle swaylock
+
+    # gui
+    firefox discord-ptb telegram-desktop mako 
     (google-chrome.override {
       commandLineArgs = [
         "--ozone-platform=wayland"
         "--enable-features=UseOzonePlatform"
       ];
     })
-    telegram-desktop 
     (pkgs.symlinkJoin {
       name = "spotify-wayland";
       paths = [ pkgs.spotify ];
@@ -35,70 +60,6 @@
           --add-flags "--enable-features=UseOzonePlatform"
       '';
     })
-    discord-ptb
-    mako
-
-    # cli utils
-    git wget psmisc htop ranger pciutils lshw tmux ffmpeg unzip jq
-
-    # audio
-    pavucontrol pamixer alsa-utils pulseaudio
-
-    # vanity
-    fastfetch pipes cmatrix cowsay
-
-    # Global dev tools
-    direnv
-    gcc
-    cmake
-    gnumake
-    man-pages
-    man-pages-posix
-    claude-code
-
-    # Python
-    graphviz
-    python3 uv pyright
-    python3Packages.ipython
-
-    # JavaScript/TypeScript
-    nodejs bun deno
-    # nodePackages.pnpm
-    # nodePackages.typescript
-
-    # lua
-    lua
-    lua-language-server
-    
-    # Rust
-    rustc cargo rust-analyzer
-
-    # C
-    clang-tools
-    
-    # LaTeX
-    # texlive.combined.scheme-full
-    zathura
-    
-    # Hyprland (parallel install with Sway for migration)
-    hyprland
-    vanilla-dmz       # cursor icons
-    kitty             # terminal
-    waybar            # system bar
-    wofi              # dmenu but wayland
-    grim              # screenshots
-    slurp             # area selection w/ grim
-    hypridle          # idle management
-    swaybg            # wallpaper
-    brightnessctl     # brightness control
-    wl-clipboard      # clipboard
-    swaylock          # screen locker
-
-    # neovim
-    neovim
-    ripgrep
-    tree-sitter
-
   ];
 
   programs.neovim = {
@@ -171,6 +132,7 @@
       screensaver = "pipes.sh -t 1 -r 20000 -p 5 -f 25 -c 5";
       open = "google-chrome-stable";
       claude = "claude --dangerously-skip-permissions";
+      weather = "curl -s wttr.in/slc | head -n -3";
     };
 
     # zsh port of the snowflake λ prompt
