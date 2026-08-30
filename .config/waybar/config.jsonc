@@ -22,6 +22,8 @@
     "modules-right": [
         "tray",
         "cpu",
+        "temperature",
+        "custom/gpu",
         "memory",
         "battery",
         "network",
@@ -48,16 +50,32 @@
     },
 
     "cpu": {
-        "format": "<span size='x-large' rise='-1300'></span> {usage}%",
+        "format": "<span size='x-large' rise='-1300'></span> {usage:>3}%",
         "interval": 2,
 
         "states": {
             "critical": 90
         }
     },
+    // CPU package temperature (k10temp / Tctl).
+    "temperature": {
+        "hwmon-path-abs": "/sys/devices/pci0000:00/0000:00:18.3/hwmon",
+        "input-filename": "temp1_input",
+        "format": "+{temperatureC:>2}°C",
+        "interval": 2,
+        "critical-threshold": 90,
+        "tooltip": false
+    },
+
+    "custom/gpu": {
+        "format": "<span size='x-large' rise='-1300'></span> {}",
+        "exec": "$HOME/.config/waybar/scripts/gpu.sh",
+        "interval": 2,
+        "tooltip": false
+    },
 
     "memory": {
-        "format": "<span size='x-large' rise='-1300'></span> {used:0.1f}G/{total:0.0f}G",
+        "format": "<span size='x-large' rise='-1300'></span> {used:>4.1f}G/{total:0.0f}G",
         "interval": 2,
 
         "states": {
@@ -65,8 +83,8 @@
         }
     },
     "battery": {
-        "format": "<span size='x-large' rise='-1300'>{icon}</span> {capacity}%",
-        "format-charging": "<span size='x-large' rise='-1300'></span> {capacity}%",
+        "format": "<span size='x-large' rise='-1300'>{icon}</span> {capacity:>3}%",
+        "format-charging": "<span size='x-large' rise='-1300'></span> {capacity:>3}%",
         "format-icons": ["", "", "", "", ""],
         "interval": 5,
         "states": {
@@ -87,9 +105,9 @@
     "pulseaudio": {
         "scroll-step": 5,
         "max-volume": 150,
-        "format": "<span size='x-large' rise='-1300'>{icon}</span> {volume}%",
+        "format": "<span size='x-large' rise='-1300'>{icon}</span> {volume:>3}%",
         "format-muted": "<span size='x-large' rise='-1300'></span> muted",
-        "format-bluetooth": "<span size='x-large' rise='-1300'></span> {volume}%",
+        "format-bluetooth": "<span size='x-large' rise='-1300'></span> {volume:>3}%",
         "format-icons": {"default": ["", ""]},
         "nospacing": 1,
         "on-click": "pavucontrol",

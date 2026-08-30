@@ -34,8 +34,21 @@ tooltip {
 
 #cpu {
     margin: 0px;
-    padding: 2px 10px;
+    padding: 2px 4px 2px 10px;
     color: #f4a261;
+}
+
+/* rendered as the tail of the cpu section, so no left padding */
+#temperature {
+    margin: 0px;
+    padding: 2px 10px 2px 0px;
+    color: #f4a261;
+}
+
+#custom-gpu {
+    margin: 0px;
+    padding: 2px 10px;
+    color: #63cdcf;
 }
 
 #memory {
@@ -54,6 +67,9 @@ tooltip {
     margin: 0px;
     padding: 2px 10px;
     color: #baa1e2;
+    /* bandwidth readout swings from "12b/s" to "118Mb/s"; pin the width
+       so the modules to its left don't jump every refresh */
+    min-width: 70px;
 }
 
 #pulseaudio {
@@ -110,6 +126,7 @@ tooltip {
 
 
 #cpu.critical,
+#temperature.critical,
 #memory.critical {
     background-color: #2b3b51;
     border: 2px solid #c94f6d;
