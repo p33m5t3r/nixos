@@ -4,20 +4,22 @@ vim.opt.hidden = true
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.autoindent = true
-vim.opt.mouse = 'a'
 vim.opt.shiftwidth = 4
 vim.opt.softtabstop = 4
 vim.opt.expandtab = true
+vim.opt.termguicolors = true
+vim.opt.scrolloff = 8
+vim.opt.undofile = true
+vim.opt.showmode = false
+vim.opt.smartcase = true
+vim.opt.cmdheight = 0   -- no permanent cmdline row; ":" draws over the statusline
+vim.opt.mouse = 'a'
+vim.opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
 vim.opt.backspace = {'indent', 'eol', 'start'}
 vim.opt.clipboard = 'unnamedplus'
 vim.opt.completeopt = "menuone,noinsert,noselect"
 vim.opt.shortmess = vim.opt.shortmess + "c"
-vim.opt.termguicolors = true
-vim.opt.scrolloff = 8
-vim.opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
-vim.opt.undofile = true
-vim.opt.cmdheight = 0   -- no permanent cmdline row; ":" draws over the statusline
-vim.opt.showmode = false
+vim.g.netrw_bufsettings = 'noma nomod nu rnu nobl nowrap ro'
 vim.cmd([[
   autocmd FileType lua setlocal shiftwidth=2 softtabstop=2
   autocmd FileType nix setlocal shiftwidth=2 softtabstop=2
@@ -25,16 +27,8 @@ vim.cmd([[
   autocmd FileType typescriptreact,typescript setlocal shiftwidth=2 softtabstop=2
 ]])
 
--- leader must be set before lazy.nvim loads
 vim.g.mapleader = " "
-
 ---------------------- colorscheme ----------------------
--- $THEME names the desktop-wide look and is exported by hyprland
--- (~/.config/hypr/theme-<name>.lua), so nvim matches the bar and the terminal
--- it was opened from. Unset falls back to the default look.
---   default - nightfox / dayfox, both from nightfox.nvim
---   nina    - light paper theme, hand-written, see colors/nina.lua
--- $COLORCONFIG=light picks a theme's light variant where it has one.
 local Theme = os.getenv('THEME') or 'default'
 
 local colorschemes = {
@@ -49,80 +43,6 @@ local set_colorscheme = function(mode)
     vim.cmd('colorscheme default')
   end
 end
--- (applied after lazy loads the colorscheme plugin, see below)
-
----------------------- keybinds -------------------------
-vim.keymap.set("n", "<C-d>", "<C-d>zz",
-{ desc = "Scroll down keeping cursor centered" })
-vim.keymap.set("n", "<C-u>", "<C-u>zz",
-{ desc = "Scroll up keeping cursor centered" })
-vim.keymap.set("n", "n", "nzzzv",
-{ desc = "Next search result centered" })
-vim.keymap.set("n", "N", "Nzzzv",
-{ desc = "Previous search result centered" })
-vim.keymap.set('n', '<leader>nt', ':tabnew<CR>',
-{ silent = true, desc = "New tab" })
-vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float,
-{ desc = "Show LSP error" })
-vim.keymap.set("n", "<leader>gs", vim.cmd.Git,
-{ desc = "Open Git status" })
-vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle,
-{ desc = "Toggle undotree" })
-vim.keymap.set("n", "<leader>fb", vim.cmd.Ex,
-{ desc = "Open netrw explorer" })
-
-vim.keymap.set("n", "<leader>fm", function () vim.lsp.buf.format() end,
-{ desc = "invoke lsp formatter" })
-
-vim.keymap.set("n", "<leader>yp", function()
-  local abs = vim.fn.expand("%:p")
-  if abs == "" then
-    vim.notify("no file in buffer", vim.log.levels.WARN)
-    return
-  end
-  local root = vim.fn.systemlist({
-    "git", "-C", vim.fn.fnamemodify(abs, ":h"), "rev-parse", "--show-toplevel"
-  })[1]
-  if vim.v.shell_error ~= 0 or not root or root == "" then
-    vim.notify("not in a git repo", vim.log.levels.WARN)
-    return
-  end
-  local rel = abs:sub(#root + 2)
-  vim.fn.setreg("+", rel)
-  vim.fn.setreg('"', rel)
-  vim.notify("yanked: " .. rel)
-end, { desc = "Yank buffer path relative to git root" })
-
-vim.keymap.set("n", "<leader>cc", function()
-    local current_cc = vim.wo.colorcolumn
-    if current_cc == "" then
-        vim.wo.colorcolumn = "80"
-    else
-        vim.wo.colorcolumn = ""
-    end
-end, { desc = "Toggle 80 char column" })
-vim.keymap.set('v', '<leader>x', "y<cmd>lua load(vim.fn.getreg('\"'))()<CR>",
-{ noremap = true, silent = true, desc = "Execute selected Lua code" })
-vim.keymap.set('n', '<leader>x', 'V"zy<cmd>lua load(vim.fn.getreg("z"))()<CR>',
-{ noremap = true, silent = true, desc = "Execute current line as Lua code" })
-
--- Lua file execution (only in Lua files)
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "lua",
-  callback = function()
-    vim.keymap.set({'n', 'v'}, '<leader>r', ':luafile %<CR>',
-      { noremap = true, silent = true, buffer = true, desc = "Run current Lua file" })
-  end
-})
-
--- TypeScript file execution (only in TypeScript files)
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "typescript",
-  callback = function()
-    vim.keymap.set('n', '<leader>r', ':!bun run dev<CR>',
-      { noremap = true, silent = true, buffer = true, desc = "Run current TypeScript file" })
-  end
-})
 
 ---------------------- lazy.nvim bootstrap ----------------------
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -162,6 +82,7 @@ require("lazy").setup({
 
   -- git
   "tpope/vim-fugitive",
+  { "sindrets/diffview.nvim", dependencies = { "nvim-tree/nvim-web-devicons" } },
   {
     "lewis6991/gitsigns.nvim",
     opts = {
@@ -187,13 +108,9 @@ set_colorscheme(os.getenv('COLORCONFIG'))
 require('nvim-tree').setup({
   disable_netrw = false,   -- keep <leader>fb (netrw) working
   hijack_netrw = false,
-  view = { width = 35, preserve_window_proportions = true },
+  view = { width = 60, preserve_window_proportions = true },
   renderer = { group_empty = true },
 })
-vim.keymap.set("n", "<leader>nn", ":NvimTreeFindFileToggle<CR>",
-{ silent = true, desc = "Toggle nvim-tree (reveal current file)" })
-vim.keymap.set("n", "<leader>nr", ":NvimTreeRefresh<CR>",
-{ silent = true, desc = "Refresh nvim-tree" })
 
 ---------------------- indent guides (off by default) --
 local ibl_highlight = {
@@ -215,8 +132,6 @@ require('ibl').setup {
     },
     scope = { enabled = false },
 }
-vim.keymap.set("n", "<leader>w", vim.cmd.IBLToggle,
-{ desc = "toggle indent guides" })
 
 ---------------------- status bar (lualine) ------------
 -- show the lsp client(s) attached to the current buffer
@@ -353,11 +268,6 @@ vim.api.nvim_create_autocmd('RecordingLeave', {
 })
 
 ---------------------- treesitter ----------------------
--- main branch: install parsers here, highlight natively via vim.treesitter.start
--- (autocmd below). install() is async + idempotent (skips already-installed).
--- note: "latex" omitted on purpose — the nixos tree-sitter CLI is too new for
--- nvim-treesitter's generate step (rejects --no-bindings), so it can't compile
--- here. add it back via a nix-provided parser if you want latex-in-markdown.
 require('nvim-treesitter').install({
   "python", "typescript", "tsx", "javascript",
   "lua", "vim", "vimdoc", "query",
@@ -380,8 +290,7 @@ vim.api.nvim_create_autocmd("FileType", {
 -- Set folding based on treesitter
 vim.opt.foldmethod = "expr"
 vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
--- Start with all folds open
-vim.opt.foldenable = false
+vim.opt.foldlevelstart = 99
 
 ---------------------- telescope -----------------------
 require('telescope').setup({
@@ -391,43 +300,186 @@ require('telescope').setup({
       }
     }
   })
------------------------- file jumping ----------------------------
---- <C-v>	Go to file selection as a vsplit
---- <C-t>	Go to a file in a new tab
 local builtin = require('telescope.builtin')
-vim.keymap.set('n', '<C-p>', builtin.git_files, { desc = "Telescope: git files" })
-vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = "Telescope: find files" })
-vim.keymap.set('n', '<leader>fg', builtin.current_buffer_fuzzy_find, { desc = "Telescope: fuzzy find in buffer" })
-vim.keymap.set('n', '<C-f>', builtin.live_grep, { desc = "Telescope: live grep" })
-vim.keymap.set('n', '<leader>j', builtin.jumplist, { desc = "Telescope: jumplist" })
+local actions = require('telescope.actions')
 
----------------------- harpoon --------------------------
-local harpoon = require("harpoon")
-harpoon:setup()
-vim.keymap.set('n', '<leader>ha', function() harpoon:list():add() end, { desc = "Harpoon: add file" })
-vim.keymap.set('n', '<leader>hh', function() harpoon.ui:toggle_quick_menu(harpoon:list()) end, { desc = "Harpoon: toggle menu" })
-vim.keymap.set('n', '<leader>h1', function () harpoon:list():select(1) end, { desc = "Harpoon: file 1" })
-vim.keymap.set('n', '<leader>h2', function () harpoon:list():select(2) end, { desc = "Harpoon: file 2" })
-vim.keymap.set('n', '<leader>h3', function () harpoon:list():select(3) end, { desc = "Harpoon: file 3" })
-vim.keymap.set('n', '<leader>h4', function () harpoon:list():select(4) end, { desc = "Harpoon: file 4" })
+------------------------ marks ----------------------------
+
+local function picker_with(picker, binds, opts)
+  return function()
+    picker(vim.tbl_extend('force', opts or {}, {
+      attach_mappings = function(_, map)
+        for _, b in ipairs(binds) do map(b[1], b[2], b[3]) end
+        return true
+      end,
+    }))
+  end
+end
+
+local function mark_entry_maker(item)
+  local entry = require('telescope.make_entry').gen_from_marks({})(item)
+  if not entry then return nil end
+  local mark = entry.ordinal:match('^%s*(%S+)')
+  local file = entry.filename or vim.api.nvim_buf_get_name(0)
+  entry.display = string.format('%-3s %s:%d', mark:lower(), vim.fn.fnamemodify(file, ':t'), entry.lnum)
+  return entry
+end
 
 ---------------------- gitsigns -------------------------
 local gitsigns = require('gitsigns')
-vim.keymap.set("n", "<leader>gt", function()
-    gitsigns.toggle_signs()
-end, { desc = "Gitsigns: toggle signs" })
+local function diffview_toggle(args)
+    if next(require('diffview.lib').views) then
+        vim.cmd('DiffviewClose')
+    else
+        vim.cmd('DiffviewOpen ' .. args)
+    end
+end
 
-vim.keymap.set("n", "<leader>gh", function()
-    gitsigns.preview_hunk_inline()
-end, { desc = "Gitsigns: preview hunk inline" })
+------------------------- binds ------------------------------
 
-vim.keymap.set("n", "<leader>gu", function()
-    gitsigns.reset_hunk()
-end, { desc = "Gitsigns: reset hunk" })
+-- core
+-- a
+vim.keymap.set('n', '<leader>a', picker_with(builtin.marks, {
+                                   { 'n', 'dd', actions.delete_mark } },
+                                   { entry_maker = mark_entry_maker }),
+                                   { desc = "Telescope: marks (dd deletes)" })
 
-vim.keymap.set("n", "<leader>gw", function()
-    gitsigns.toggle_word_diff()
-end, { desc = "Gitsigns: toggle word diff" })
+-- s
+vim.keymap.set('n', '<leader>s',  vim.lsp.buf.references,      { desc = 'LSP: list references' })
+
+-- d
+vim.keymap.set('n', '<leader>d',  vim.lsp.buf.definition,      { desc = 'LSP: go to definition' })
+vim.keymap.set('n', '<leader>D',  vim.lsp.buf.type_definition, { desc = 'LSP: type definition' })
+
+-- f
+vim.keymap.set('n', '<leader>ff', builtin.live_grep, { desc = "Telescope: live grep" })
+vim.keymap.set('n', '<leader>fd', builtin.find_files, { desc = "Telescope: find files" })
+vim.keymap.set('n', '<leader>fg', builtin.git_files, { desc = "Telescope: git files" })
+vim.keymap.set('n', '<leader>fc', builtin.current_buffer_fuzzy_find, { desc = "Telescope: fuzzy find in buffer" })
+vim.keymap.set('n', '<leader>fw', function()
+  builtin.live_grep({ default_text = vim.fn.expand("<cWORD>") })
+end, { desc = "Telescope: live grep WORD under cursor" })
+
+-- g <git stuff below>
+-- h
+vim.keymap.set('n', '<leader>h', builtin.jumplist, { desc = "Telescope: jumplist" })
+
+-- j
+vim.keymap.set('n', '<leader>j', '<C-i>', { desc = "travel up jump stack" })
+
+-- k
+vim.keymap.set('n', '<leader>k', '<C-o>', { desc = "travel down jump stack" })
+
+-- l
+vim.keymap.set('n', '<leader>l', '<C-t>', { desc = "pop tag stack" })
+
+-- ;
+
+-- text
+vim.keymap.set('x', '<A-j>', ":m '>+1<CR>gv=gv",  { silent = true, desc = "Move selection down" })
+vim.keymap.set('x', '<A-k>', ":m '<-2<CR>gv=gv",  { silent = true, desc = "Move selection up" })
+vim.keymap.set("x", "p",     "P",                 { desc = "Paste over selection without yanking it" })
+
+-- telescope
+vim.keymap.set('n', '<leader>r', builtin.resume,  { desc = "Telescope: resume" })
+vim.keymap.set('n', '<leader>t', builtin.builtin, { desc = "Telescope: pickers" })
+
+-- file explorers
+vim.keymap.set("n", "<leader>fb", function()
+  vim.cmd(vim.bo.filetype == "netrw" and "Rex" or "Ex")
+end, { desc = "Toggle netrw explorer" })
+vim.keymap.set("n", "<leader>nn", ":NvimTreeFindFileToggle<CR>", { silent = true, desc = "Toggle nvim-tree" })
+vim.keymap.set("n", "<leader>nr", ":NvimTreeRefresh<CR>", { silent = true, desc = "Refresh nvim-tree" })
+
+-- nav
+vim.keymap.set('n', '<leader>q', '<cmd>q<CR>',    { desc = "Close window" })
+vim.keymap.set("n", "<C-j>",     "<C-w>j",        { desc = "Window down" })
+vim.keymap.set("n", "<C-k>",     "<C-w>k",        { desc = "Window up" })
+vim.keymap.set("n", "<C-l>",     "<C-w>l",        { desc = "Window right" })
+vim.keymap.set("n", "<A-l>",     "gt",            { desc = "Next tab" })
+vim.keymap.set('n', '<leader>nt', ':tabnew<CR>',  { silent = true, desc = "New tab" })
+-- vim.keymap.set('n', '<C-f>', builtin.live_grep, { desc = "Telescope: live grep" })
+-- vim.keymap.set('n', 'K',          vim.lsp.buf.hover,           { desc = 'LSP: hover docs' })
+
+-- scrolling
+vim.keymap.set("n", "<C-u>", "<C-u>zz", { desc = "Scroll up keeping cursor centered" })
+vim.keymap.set("n", "<C-d>", "<C-d>zz", { desc = "Scroll down keeping cursor centered" })
+vim.keymap.set("n", "n", "nzzzv",       { desc = "Next search result centered" })
+vim.keymap.set("n", "N", "Nzzzv",       { desc = "Previous search result centered" })
+
+-- misc
+vim.keymap.set("n", "<leader>gs", vim.cmd.Git,          { desc = "Open Git status" })
+vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle,{ desc = "Toggle undotree" })
+vim.keymap.set("n", "<Esc>",     "<cmd>nohlsearch<CR>", { desc = "Clear search highlights" })
+vim.keymap.set("n", "<C-h>",     "<C-w>h",              { desc = "Window left" })
+vim.keymap.set("n", "<A-h>",     "gT",                  { desc = "Previous tab" })
+
+vim.keymap.set("n", "<leader>yp", function()
+  local abs = vim.fn.expand("%:p")
+  if abs == "" then
+    vim.notify("no file in buffer", vim.log.levels.WARN)
+    return
+  end
+  local root = vim.fn.systemlist({
+    "git", "-C", vim.fn.fnamemodify(abs, ":h"), "rev-parse", "--show-toplevel"
+  })[1]
+  if vim.v.shell_error ~= 0 or not root or root == "" then
+    vim.notify("not in a git repo", vim.log.levels.WARN)
+    return
+  end
+  local rel = abs:sub(#root + 2)
+  vim.fn.setreg("+", rel)
+  vim.fn.setreg('"', rel)
+  vim.notify("yanked: " .. rel)
+end, { desc = "Yank buffer path relative to git root" })
+
+vim.keymap.set("n", "<leader>cc", function()
+    local current_cc = vim.wo.colorcolumn
+    if current_cc == "" then
+        vim.wo.colorcolumn = "80"
+    else
+        vim.wo.colorcolumn = ""
+    end
+end, { desc = "Toggle 80 char column" })
+
+vim.keymap.set('v', '<leader>x', "y<cmd>lua load(vim.fn.getreg('\"'))()<CR>",
+{ noremap = true, silent = true, desc = "Execute selected Lua code" })
+vim.keymap.set('n', '<leader>x', 'V"zy<cmd>lua load(vim.fn.getreg("z"))()<CR>',
+{ noremap = true, silent = true, desc = "Execute current line as Lua code" })
+
+vim.keymap.set("n", "<leader>w", vim.cmd.IBLToggle, { desc = "toggle indent guides" })
+
+-- marks
+for c in ('abcdefghijklmnopqrstuvwxyz'):gmatch('.') do
+  vim.keymap.set({ 'n', 'x', 'o' }, 'm' .. c, 'm' .. c:upper())
+  vim.keymap.set({ 'n', 'x', 'o' }, "'" .. c, "'" .. c:upper())
+  vim.keymap.set({ 'n', 'x', 'o' }, '`' .. c, '`' .. c:upper())
+end
+
+-- lsp
+vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename,                   { desc = 'LSP: rename symbol' })
+vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float,             { desc = "Show LSP error" })
+vim.keymap.set("n", "<leader>fm", function () vim.lsp.buf.format() end, { desc = "invoke lsp formatter" })
+vim.keymap.set({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action,     { desc = 'LSP: code action' })
+vim.keymap.set('n', 'gd',         vim.lsp.buf.definition,               { desc = 'LSP: go to definition' })
+vim.keymap.set('n', 'gD',         vim.lsp.buf.declaration,              { desc = 'LSP: go to declaration' })
+vim.keymap.set('n', 'gr',         vim.lsp.buf.references,               { desc = 'LSP: list references' })
+vim.keymap.set('n', 'gr',         vim.lsp.buf.references,               { desc = 'LSP: list references' })
+
+-- Git
+vim.keymap.set("n", "<leader>gt", function() gitsigns.toggle_signs() end,        { desc = "toggle signs" })
+vim.keymap.set("n", "<leader>gh", function() gitsigns.preview_hunk_inline() end, { desc = "preview hunk" })
+vim.keymap.set("n", "<leader>gu", function() gitsigns.reset_hunk() end,          { desc = "reset hunk" })
+vim.keymap.set("n", "<leader>gw", function() gitsigns.toggle_word_diff() end,    { desc = "word diff" })
+vim.keymap.set("n", "<leader>gd", function() 
+  diffview_toggle('main...HEAD')
+end, { desc = "diff" })
+vim.keymap.set("n", "<leader>gl", function()
+    diffview_toggle('main...HEAD --imply-local')
+end, { desc = "diff, incl. uncommitted" })
+vim.keymap.set("n", "<leader>gD", function()
+    diffview_toggle('')
+end, { desc = "diff uncommitted only" })
 
 vim.keymap.set("n", "<leader>gb", function()
     for _, win in ipairs(vim.api.nvim_list_wins()) do
@@ -439,7 +491,6 @@ vim.keymap.set("n", "<leader>gb", function()
     end
     vim.cmd('Gitsigns blame')
 end, { desc = "Toggle Gitsigns blame panel" })
-
 ------------------------ LSP config ----------------------------
 
 -- python
@@ -488,26 +539,6 @@ vim.lsp.enable('lua_ls')
 vim.lsp.config('ts_ls', {})
 vim.lsp.enable('ts_ls')
 
-
-vim.api.nvim_create_autocmd('LspAttach', {
-  group = vim.api.nvim_create_augroup('UserLspConfig', {}),
-  callback = function(ev)
-    -- Enable completion triggered by <c-x><c-o>
-    vim.bo[ev.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
-    local function map(mode, lhs, rhs, desc)
-      vim.keymap.set(mode, lhs, rhs, { buffer = ev.buf, desc = desc })
-    end
-    map('n', 'gd', vim.lsp.buf.definition,           'LSP: go to definition')
-    map('n', 'gD', vim.lsp.buf.declaration,          'LSP: go to declaration')
-    map('n', 'gi', vim.lsp.buf.implementation,       'LSP: go to implementation')
-    map('n', 'gr', vim.lsp.buf.references,           'LSP: list references')
-    map('n', 'K',  vim.lsp.buf.hover,                'LSP: hover docs')
-    map('n', '<leader>D',  vim.lsp.buf.type_definition, 'LSP: type definition')
-    map('n', '<leader>rn', vim.lsp.buf.rename,          'LSP: rename symbol')
-    map({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, 'LSP: code action')
-  end,
-})
-
 -- Setup Completion
 -- See https://github.com/hrsh7th/nvim-cmp#basic-configuration
 local lspkind = require('lspkind')
@@ -549,3 +580,36 @@ cmp.setup({
     { name = "buffer" },
   },
 })
+
+
+---------------------- legacy --------------------------
+-- local harpoon = require("harpoon")
+-- harpoon:setup()
+-- vim.keymap.set('n', '<leader>ha', function() harpoon:list():add() end, { desc = "Harpoon: add file" })
+-- vim.keymap.set('n', '<leader>hh', function() harpoon.ui:toggle_quick_menu(harpoon:list()) end, { desc = "Harpoon: toggle menu" })
+-- vim.keymap.set('n', '<leader>h1', function () harpoon:list():select(1) end, { desc = "Harpoon: file 1" })
+-- vim.keymap.set('n', '<leader>h2', function () harpoon:list():select(2) end, { desc = "Harpoon: file 2" })
+-- vim.keymap.set('n', '<leader>h3', function () harpoon:list():select(3) end, { desc = "Harpoon: file 3" })
+-- vim.keymap.set('n', '<leader>h4', function () harpoon:list():select(4) end, { desc = "Harpoon: file 4" })
+
+-- superseded by the global LSP keymaps in the LSP config section
+-- vim.keymap.set('n', '<leader>d', function() vim.notify('no lsp', vim.log.levels.WARN) end, { desc = 'LSP: go to definition'})
+-- vim.api.nvim_create_autocmd('LspAttach', {
+--   group = vim.api.nvim_create_augroup('UserLspConfig', {}),
+--   callback = function(ev)
+--     -- Enable completion triggered by <c-x><c-o>
+--     vim.bo[ev.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
+--     local function map(mode, lhs, rhs, desc)
+--       vim.keymap.set(mode, lhs, rhs, { buffer = ev.buf, desc = desc })
+--     end
+--     map('n', 'gd', vim.lsp.buf.definition,           'LSP: go to definition')
+--     map('n', '<leader>d', vim.lsp.buf.definition,     'LSP: go to definition')
+--     map('n', 'gD', vim.lsp.buf.declaration,          'LSP: go to declaration')
+--     map('n', 'gi', vim.lsp.buf.implementation,       'LSP: go to implementation')
+--     map('n', 'gr', vim.lsp.buf.references,           'LSP: list references')
+--     map('n', 'K',  vim.lsp.buf.hover,                'LSP: hover docs')
+--     map('n', '<leader>D',  vim.lsp.buf.type_definition, 'LSP: type definition')
+--     map('n', '<leader>rn', vim.lsp.buf.rename,          'LSP: rename symbol')
+--     map({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, 'LSP: code action')
+--   end,
+-- })
