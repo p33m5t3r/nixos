@@ -1,4 +1,3 @@
-
 hl.config({
     input = {
         kb_layout  = "us",
@@ -96,7 +95,7 @@ hl.bind(mainMod .. " + SHIFT + l", hl.dsp.window.move({ direction = "right" }))
 hl.bind(mainMod .. " + minus",         hl.dsp.workspace.toggle_special("magic"))
 hl.bind(mainMod .. " + SHIFT + minus", hl.dsp.window.move({ workspace = "special:magic" }))
 
-hl.bind(mainMod .. " + b",             hl.dsp.exec_cmd("pkill -SIGUSR1 -f waybar"))
+hl.bind(mainMod .. " + b",             hl.dsp.exec_cmd([[pkill -SIGUSR1 -x 'waybar|\.waybar-wrapped' || ]] .. Bar)) -- toggle, or relaunch if crashed
 hl.bind(mainMod .. " + SHIFT + b",     hl.dsp.exec_cmd("pkill -SIGUSR2 -f waybar"))
 hl.bind(mainMod .. " + SHIFT + semicolon", hl.dsp.layout("togglesplit"))
 hl.bind(mainMod .. " + semicolon",     hl.dsp.layout("togglesplit"))

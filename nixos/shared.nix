@@ -19,7 +19,7 @@
     # cli/dev utils
     man-pages man-pages-posix
     git wget psmisc htop pciutils lm_sensors lshw tmux ffmpeg unzip jq 
-    kitty neovim ripgrep tree-sitter ranger
+    kitty neovim ripgrep fzf tree-sitter ranger
     
     # audio
     pavucontrol pamixer alsa-utils pulseaudio
@@ -112,6 +112,8 @@
   };
 
   programs.zsh = {
+    # todo: set XDG_ZDOTDIR, use normal .zshrc, repoint XDG_CONFIG_HOME if works
+    # also: fix --command zsh flakes, add git prompt
     enable = true;
     enableCompletion = true;
     autosuggestions.enable = true;
@@ -144,12 +146,16 @@
     '';
 
     interactiveShellInit = ''
-      export PATH="$HOME/.scripts:$PATH"
       eval "$(direnv hook zsh)"
     '';
   };
 
   services.libinput.enable = true;
+
+  # non-root hidraw access, so the VIA web app can see QMK boards
+  # TODO: remove me- security issue kind of
+  hardware.keyboard.qmk.enable = true;
+
   services.openssh = {
     enable = true;
     settings = {
