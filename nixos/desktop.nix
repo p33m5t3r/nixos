@@ -24,4 +24,7 @@
     GBM_BACKEND = "nvidia-drm";
     __GLX_VENDOR_LIBRARY_NAME = "nvidia";
   };
+
+  # release this machine was first installed with. NO TOUCH!
+  system.stateVersion = "24.11";
 }

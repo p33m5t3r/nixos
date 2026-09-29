@@ -175,7 +175,4 @@
   security.sudo.extraConfig = ''
     Defaults timestamp_timeout=120
   '';
-
-  # NO TOUCH!
-  system.stateVersion = "24.11";
 }

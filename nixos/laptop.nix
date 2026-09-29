@@ -11,4 +11,7 @@
   hardware.gamecube-adapter.enable = true;
 
   programs.zsh.shellAliases.rebuild = "sudo nixos-rebuild switch --flake ~/nixos/nixos#laptop";
+
+  # release this machine was first installed with. NO TOUCH!
+  system.stateVersion = "24.11";
 }
