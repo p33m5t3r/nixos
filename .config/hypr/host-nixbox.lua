@@ -1,3 +1,4 @@
+-- desktop
 
 -- main monitor
 hl.monitor({
@@ -27,3 +28,5 @@ hl.monitor({
 -- others
 hl.monitor({ output = "", disabled = true })
 
+-- outputs that get the theme's "side" wallpaper instead of the main one
+SideOutputs = { "HDMI-A-1" }

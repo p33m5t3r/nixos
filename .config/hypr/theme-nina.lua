@@ -51,9 +51,11 @@ hl.env("XCURSOR_SIZE", "24")
 local function set_wallpaper()
     local w1 = home .. "/wallpaper/nina-main.png"
     local w2 = home .. "/wallpaper/nina-side.png"
-    hl.exec_cmd(([[
-      pgrep swaybg >/dev/null || swaybg -o DP-1 -i %s -o HDMI-A-1 -i %s -m fill
-    ]]):format(w1, w2))
+    local cmd = ("swaybg -o '*' -i %s -m fill"):format(w1)
+    for _, o in ipairs(SideOutputs or {}) do
+        cmd = cmd .. (" -o %s -i %s -m fill"):format(o, w2)
+    end
+    hl.exec_cmd("pgrep swaybg >/dev/null || " .. cmd)
 end
 
 hl.on("config.reloaded", set_wallpaper)
